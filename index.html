@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI秘書相談室 | AUU</title>
+  <meta name="description" content="歩美と歩夢が寄り添いながら、ビジネス上のお悩みや課題をやさしく整理するAI秘書ウェブアプリです。" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-glow page-glow-left"></div>
+  <div class="page-glow page-glow-right"></div>
+
+  <button id="chatLauncher" class="chat-launcher" type="button" aria-controls="chatBox" aria-expanded="false">
+    AI秘書に相談する
+  </button>
+
+  <section id="chatBox" class="chat-box" aria-label="AI秘書相談室" hidden>
+    <header class="chat-header">
+      <div class="chat-header-main">
+        <img id="headerAvatar" class="header-avatar" src="assets/ayumi.png" alt="" />
+        <div class="chat-header-text">
+          <div id="headerTitle" class="chat-header-title">AI秘書相談室</div>
+          <div id="headerSubtitle" class="chat-header-subtitle">歩美と歩夢がお悩みをやさしく整理します</div>
+        </div>
+      </div>
+      <button id="chatClose" class="chat-close" type="button" aria-label="閉じる">×</button>
+    </header>
+
+    <div id="chatBody" class="chat-body"></div>
+
+    <form id="chatComposer" class="chat-composer" autocomplete="off">
+      <textarea
+        id="chatInput"
+        class="chat-input"
+        rows="1"
+        placeholder="お悩みなど、なんでも気軽にお話しください"
+      ></textarea>
+      <button id="sendButton" class="send-button" type="submit">送信</button>
+    </form>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

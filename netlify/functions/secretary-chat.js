@@ -162,7 +162,7 @@ async function callOpenAI(messages) {
       "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
     },
     body: JSON.stringify({
-      model: process.env.OPENAI_MODEL || "gpt-5.4",
+      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
       messages,
       max_completion_tokens: 350
     })

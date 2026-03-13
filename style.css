@@ -560,23 +560,109 @@ body {
   }
 
   .chat-box {
-  right: 8px;
-  left: 8px;
-  bottom: 72px;
-  width: auto;
-  height: min(78vh, 700px);
-  border-radius: 20px;
-}
+    right: 8px;
+    left: 8px;
+    bottom: 72px;
+    width: auto;
+    height: min(78vh, 700px);
+    border-radius: 20px;
+  }
+
+  .chat-header {
+    padding: 12px 12px 10px;
+  }
+
+  .chat-header-title {
+    font-size: 15px;
+  }
+
+  .chat-header-subtitle {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .chat-body {
+    padding: 14px 10px 16px;
+  }
 
   .selection-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .secretary-card {
+    padding: 14px;
   }
 
   .secretary-portrait-large {
-    aspect-ratio: 4 / 4.8;
+    width: 100%;
+    max-width: 220px;
+  }
+
+  .message-row {
+    gap: 8px;
+  }
+
+  .avatar {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
   }
 
   .message {
-    max-width: 88%;
+    max-width: 82%;
+    font-size: 13px;
+    line-height: 1.65;
+    box-sizing: border-box;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .message-row.bot .message {
+    max-width: calc(100% - 38px);
+  }
+
+  .option-row,
+  .form-card,
+  .link-note {
+    margin-left: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .chat-composer {
+    display: flex;
+    gap: 8px;
+    padding: 10px 10px 12px;
+    border-top: 1px solid var(--line-soft);
+    background: rgba(255, 255, 255, 0.94);
+    align-items: flex-end;
+    box-sizing: border-box;
+  }
+
+  .chat-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    min-height: 44px;
+    max-height: 140px;
+    resize: none;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 18px;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    font-family: inherit;
+    color: var(--text-main);
+    background: #fff;
+    box-sizing: border-box;
+  }
+
+  .send-button {
+    flex: 0 0 64px;
+    min-width: 64px;
+    height: 44px;
+    border-radius: 14px;
+    font-size: 13px;
   }
 }

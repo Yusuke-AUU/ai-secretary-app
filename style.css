@@ -118,6 +118,7 @@ body {
   height: 42px;
   border-radius: 50%;
   object-fit: cover;
+  object-position: center top;
   border: 2px solid rgba(255, 255, 255, 0.95);
   box-shadow: 0 6px 14px rgba(27, 53, 87, 0.12);
 }

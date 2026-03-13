@@ -559,14 +559,16 @@ body {
     text-align: center;
   }
 
-  .chat-box {
-    right: 8px;
-    left: 8px;
-    bottom: 72px;
-    width: auto;
-    height: min(78vh, 700px);
-    border-radius: 20px;
-  }
+ .chat-box {
+   left: 8px;
+   right: 8px;
+   bottom: 72px;
+   width: calc(100vw - 16px) !important;
+   max-width: calc(100vw - 16px) !important;
+   height: min(78vh, 700px);
+   border-radius: 20px;
+   box-sizing: border-box;
+ }
 
   .chat-header {
     padding: 12px 12px 10px;

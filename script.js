@@ -220,14 +220,14 @@ async function fetchAIReply() {
     })
   });
 
-  if (!response.ok) {
-    throw new Error("AI response failed");
-  }
-
   const data = await response.json();
 
+  if (!response.ok) {
+    throw new Error(data.detail || data.error || "AI response failed");
+  }
+
   if (data.error || data.configMissing) {
-    throw new Error(data.error || "AI configuration missing");
+    throw new Error(data.detail || data.error || "AI configuration missing");
   }
 
   if (data.reply) {

@@ -482,10 +482,12 @@ body {
 
 .chat-composer {
   display: flex;
-  gap: 10px;
-  padding: 12px 14px 14px;
+  gap: 8px;
+  padding: 10px 10px 12px;
   border-top: 1px solid var(--line-soft);
   background: rgba(255, 255, 255, 0.94);
+  align-items: flex-end;
+  box-sizing: border-box;
 }
 
 .chat-composer[hidden] {
@@ -493,8 +495,10 @@ body {
 }
 
 .chat-input {
-  width: 100%;
-  min-height: 46px;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+  min-height: 44px;
   max-height: 140px;
   resize: none;
   border: 1px solid rgba(148, 163, 184, 0.35);
@@ -505,18 +509,19 @@ body {
   font-family: inherit;
   color: var(--text-main);
   background: #fff;
+  box-sizing: border-box;
 }
 
 .send-button {
-  flex: 0 0 auto;
+  flex: 0 0 64px;
   align-self: flex-end;
-  min-width: 72px;
-  height: 46px;
+  min-width: 64px;
+  height: 44px;
   border: none;
-  border-radius: 16px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #2f6fe4, #5d8ef0);
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 12px 20px rgba(36, 77, 143, 0.18);

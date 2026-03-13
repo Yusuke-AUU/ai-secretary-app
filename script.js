@@ -152,7 +152,7 @@ async function startConversation(assistantKey) {
   headerSubtitle.textContent = selectedAssistant.subtitle;
   chatBody.innerHTML = "";
   chatComposer.hidden = false;
-  chatInput.focus();
+  // chatInput.focus();
 
   await typeBotMessage(selectedAssistant.intro);
   await typeBotMessage(selectedAssistant.openingQuestion);

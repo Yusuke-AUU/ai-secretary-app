@@ -586,18 +586,25 @@ body {
   }
 
   .selection-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
 
-  .secretary-card {
-    padding: 14px;
-  }
+.secretary-card {
+  padding: 14px;
+}
 
-  .secretary-portrait-large {
-    width: 100%;
-    max-width: 220px;
-  }
+.secretary-image-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.secretary-portrait-large {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
+}
 
   .message-row {
     gap: 8px;

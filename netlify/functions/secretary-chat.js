@@ -164,7 +164,6 @@ async function callOpenAI(messages) {
     body: JSON.stringify({
       model: process.env.OPENAI_MODEL || "gpt-5.4",
       messages,
-      temperature: 0.8,
       max_completion_tokens: 350
     })
   });

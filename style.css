@@ -586,25 +586,25 @@ body {
   }
 
   .selection-grid {
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 
-.secretary-card {
-  padding: 14px;
-}
+  .secretary-card {
+    padding: 14px;
+  }
 
-.secretary-image-wrap {
-  display: flex;
-  justify-content: center;
-}
+  .secretary-image-wrap {
+    display: flex;
+    justify-content: center;
+  }
 
-.secretary-portrait-large {
-  display: block;
-  width: 100%;
-  max-width: 220px;
-  margin: 0 auto;
-}
+  .secretary-portrait-large {
+    display: block;
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
+  }
 
   .message-row {
     gap: 8px;
@@ -671,5 +671,29 @@ body {
     height: 44px;
     border-radius: 14px;
     font-size: 13px;
+  }
+
+  .chat-body,
+  .message-row,
+  .message-row.bot,
+  .message-row.user,
+  .chat-composer {
+    min-width: 0;
+  }
+
+  .message-row.bot,
+  .message-row.user {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .message.bot,
+  .message.user {
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .chat-body {
+    overflow-x: hidden;
   }
 }

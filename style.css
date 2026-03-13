@@ -563,11 +563,12 @@ body {
    left: 8px;
    right: 8px;
    bottom: 72px;
-   width: calc(100vw - 16px) !important;
-   max-width: calc(100vw - 16px) !important;
-   height: min(78vh, 700px);
+   width: auto !important;
+   max-width: none !important;
+   height: min(78dvh, 700px);
    border-radius: 20px;
    box-sizing: border-box;
+   margin: 0;
  }
 
   .chat-header {

@@ -15,26 +15,26 @@ const ASSISTANTS = {
   ayumi: {
     key: "ayumi",
     name: "歩美",
-    reading: "あゆみ",
-    role: "優しい秘書",
+    role: "思考整理型",
     image: "ayumi.png",
     shortHeader: "歩美と相談中",
-    subtitle: "やさしく寄り添いながら、お悩みを少しずつ整理します",
-    intro: "こんにちは、歩美（あゆみ）です。今日はどんなことでも気軽にお話しくださいね。",
-    openingQuestion: "今、少し気になっていることはありますか？",
-    intakeLine: "ここまでのお話で、気になっている点が少し見えてきました。必要でしたら、この内容を整理した形でお預かりできます。"
+    subtitle: "やさしく整理します",
+    selectionCopy: "知的で落ち着いた対話で、考えや論点をやさしく整理します。",
+    cta: "やさしく整理します",
+    intro: "今日は、どんなことを整理していきましょうか。",
+    intakeLine: "ここまでのお話を整理すると、相談内容の輪郭が見えてきました。必要でしたら、この内容を整理した形でお預かりできます。"
   },
-  ayumu: {
-    key: "ayumu",
-    name: "歩夢",
-    reading: "あゆむ",
-    role: "爽やか秘書",
-    image: "ayumu.png",
-    shortHeader: "歩夢と相談中",
-    subtitle: "状況や背景を落ち着いて整理しながら、お話をうかがいます",
-    intro: "こんにちは、歩夢（あゆむ）です。気になることを整理する感覚で、気軽に話してください。",
-    openingQuestion: "今、少し気になっていることはありますか？",
-    intakeLine: "ここまでのお話で、いくつか整理したい点が見えてきました。必要でしたら、この内容を整理した形でお預かりできます。"
+  noriko: {
+    key: "noriko",
+    name: "のり子",
+    role: "本音引き出し型",
+    image: "noriko.png",
+    shortHeader: "のり子と相談中",
+    subtitle: "あんた！まず話してみん",
+    selectionCopy: "まとまっとらんでもええけぇ、本音や引っかかりを遠慮なく話せます。",
+    cta: "あんた！まず話してみん",
+    intro: "あんた、どしたん。胸ん中にあるもん、ちょっと出してみん？",
+    intakeLine: "ここまで聞いたら、だいぶ芯が見えてきたが。必要なら、この内容を整理した形で預かれるで。"
   }
 };
 
@@ -54,7 +54,7 @@ let conversation = [];
 let intakePromptShown = false;
 let intakeFormShown = false;
 let latestSummary = "";
-let latestCategory = "AI秘書相談";
+let latestCategory = "経営相談";
 let latestSubcategory = "自由相談";
 let latestPriorityTheme = "";
 
@@ -86,13 +86,13 @@ function resetToSelection() {
   intakePromptShown = false;
   intakeFormShown = false;
   latestSummary = "";
-  latestCategory = "AI秘書相談";
+  latestCategory = "経営相談";
   latestSubcategory = "自由相談";
   latestPriorityTheme = "";
 
   headerAvatar.src = ASSISTANTS.ayumi.image;
-  headerTitle.textContent = "AI秘書相談室";
-  headerSubtitle.textContent = "歩美と歩夢がお悩みをやさしく整理します";
+  headerTitle.textContent = "経営相談室";
+  headerSubtitle.textContent = "相談相手を選んでください";
   chatBody.innerHTML = "";
   chatComposer.hidden = true;
   chatInput.value = "";
@@ -101,10 +101,10 @@ function resetToSelection() {
   const intro = document.createElement("div");
   intro.className = "intro-block";
   intro.innerHTML = `
-    <div class="intro-title">あなたに合うAI秘書をお選びください。</div>
+    <div class="intro-title">相談相手を選んでください</div>
     <div class="intro-text">
-      お悩みなど、なんでも気軽にお話しいただけます。<br>
-      歩美と歩夢が、寄り添いながら課題やモヤモヤをやさしく整理します。
+      経営の悩みが、まだうまく整理できていなくても大丈夫です。<br>
+      歩美とのり子が、それぞれのやり方で課題や本音を整理します。
     </div>
   `;
   chatBody.appendChild(intro);
@@ -112,12 +112,12 @@ function resetToSelection() {
   const grid = document.createElement("div");
   grid.className = "selection-grid";
   grid.appendChild(createSecretaryCard(ASSISTANTS.ayumi));
-  grid.appendChild(createSecretaryCard(ASSISTANTS.ayumu));
+  grid.appendChild(createSecretaryCard(ASSISTANTS.noriko));
   chatBody.appendChild(grid);
 
   const chip = document.createElement("div");
   chip.className = "system-chip";
-  chip.textContent = "会話の流れの中で、必要に応じて詳細ヒアリングへ進みます";
+  chip.textContent = "会話のあと、必要に応じてAUUへの相談送信へ進めます";
   chatBody.appendChild(chip);
 }
 
@@ -133,8 +133,8 @@ function createSecretaryCard(assistant) {
     <div class="secretary-card-body">
       <div class="secretary-role-badge ${assistant.key}">${assistant.role}</div>
       <div class="secretary-name">${assistant.name}</div>
-      <div class="secretary-copy">${assistant.subtitle}</div>
-      <div class="secretary-cta ${assistant.key}">Choose me</div>
+      <div class="secretary-copy">${assistant.selectionCopy}</div>
+      <div class="secretary-cta ${assistant.key}">${assistant.cta}</div>
     </div>
   `;
   button.addEventListener("click", () => startConversation(assistant.key));
@@ -152,10 +152,13 @@ async function startConversation(assistantKey) {
   headerSubtitle.textContent = selectedAssistant.subtitle;
   chatBody.innerHTML = "";
   chatComposer.hidden = false;
-  // chatInput.focus();
+  chatInput.placeholder =
+    selectedAssistant.key === "ayumi"
+      ? "整理したいことを入力してください"
+      : "胸ん中にあることを入力してみん";
+  autoResizeComposer();
 
   await typeBotMessage(selectedAssistant.intro);
-  await typeBotMessage(selectedAssistant.openingQuestion);
 }
 
 async function handleSend(event) {
@@ -178,6 +181,7 @@ async function handleSend(event) {
     const aiResult = await fetchAIReply();
     typingEl.remove();
     await typeBotMessage(aiResult.reply, false);
+
     latestCategory = aiResult.category || latestCategory;
     latestSubcategory = aiResult.subcategory || latestSubcategory;
     latestPriorityTheme = aiResult.priorityTheme || latestPriorityTheme;
@@ -199,6 +203,7 @@ async function handleSend(event) {
     latestCategory = fallback.category;
     latestSubcategory = fallback.subcategory;
     latestPriorityTheme = fallback.priorityTheme;
+
     if (fallback.shouldOfferIntake && !intakePromptShown && !intakeFormShown) {
       intakePromptShown = true;
       await typeBotMessage(selectedAssistant.intakeLine);
@@ -206,6 +211,7 @@ async function handleSend(event) {
     }
   } finally {
     sendButton.disabled = false;
+    chatInput.focus();
   }
 }
 
@@ -244,25 +250,26 @@ function buildFallbackReply(userText) {
   const categoryMap = inferCategoryFromTheme(priorityTheme);
 
   let reply = "";
+
   if (selectedAssistant.key === "ayumi") {
     if (priorityTheme) {
-      reply = `ありがとうございます。${PRIORITY_THEME_LABELS[priorityTheme]}に関わりそうなお話ですね。無理のない範囲で大丈夫ですので、背景や今いちばん気になっている点をもう少しだけ教えてください。`;
+      reply = `ありがとうございます。${PRIORITY_THEME_LABELS[priorityTheme]}に関わりそうなお話ですね。背景や、いま一番整理したい点をもう少しだけ教えていただけますか。`;
     } else if (lower.includes("人") || lower.includes("採用")) {
-      reply = "ありがとうございます。採用や体制づくりの部分で、少し整理すると見えてくることがありそうですね。今は「採れない」のか、「定着しにくい」のか、どちらが近いですか？";
+      reply = "ありがとうございます。人や体制に関わるお悩みとして整理できそうです。いまは採用そのものが難しいのか、定着や配置が難しいのか、どちらが近いでしょうか。";
     } else if (lower.includes("売上") || lower.includes("利益")) {
-      reply = "ありがとうございます。数字に関わるお悩みは、背景を少し分けてみると整理しやすくなります。売上面のお悩みなのか、利益率やコスト面のお悩みなのか、どちらが近いでしょうか？";
+      reply = "ありがとうございます。数字に関わるお悩みは、背景を分けると整理しやすくなります。売上面のお悩みなのか、利益率やコスト面のお悩みなのか、どちらが近いでしょうか。";
     } else {
-      reply = "ありがとうございます。すぐに答えを出さなくて大丈夫です。いまの状況や、最近気になっている出来事をひとつずつ教えてください。";
+      reply = "ありがとうございます。まだまとまっていなくても大丈夫です。いま気になっていることを、ひとつずつ教えてください。";
     }
   } else {
     if (priorityTheme) {
-      reply = `${PRIORITY_THEME_LABELS[priorityTheme]}に近いご相談として整理できそうです。状況をつかみたいので、背景・希望条件・時期感のうち、まず一番伝えやすいところから教えてください。`;
+      reply = `${PRIORITY_THEME_LABELS[priorityTheme]}に近い話かもしれんな。まずは、なんでそれが気になっとるんか、いちばん引っかかるところから聞かせて。`;
     } else if (lower.includes("採用") || lower.includes("人材")) {
-      reply = "ありがとうございます。採用課題として整理できそうです。対象の職種、地域、採用後の定着のどこに一番課題感がありますか？";
+      reply = "人のことで、だいぶ気ぃ使うとるんじゃな。採れんのか、続かんのか、そこらへんで一番しんどいのはどこなん。";
     } else if (lower.includes("新規") || lower.includes("事業")) {
-      reply = "ありがとうございます。新規事業や成長戦略の観点がありそうですね。狙いたい方向性と、今止まっているポイントを分けて考えると整理しやすいです。";
+      reply = "新しいことを動かす話じゃな。やりたいことはあるのに進まんのか、周りを巻き込みにくいのか、そのへん聞かせて。";
     } else {
-      reply = "ありがとうございます。全体像を急いで決めなくて大丈夫です。今いちばん引っかかっている点を、ひとつだけでも教えてください。";
+      reply = "うまいことまとまっとらんでもええよ。いま一番もやもやしとるところを、そのまま話してみん。";
     }
   }
 
@@ -282,23 +289,27 @@ function renderIntakeChoice() {
   const row = document.createElement("div");
   row.className = "option-row";
   row.innerHTML = `
-    <button type="button" class="option-button">はい、お願いします</button>
-    <button type="button" class="secondary-button">まだ少し話したいです</button>
+    <button type="button" class="option-button">相談内容を送る</button>
+    <button type="button" class="secondary-button">まだ少し話したい</button>
   `;
+
   const [primary, secondary] = row.querySelectorAll("button");
+
   primary.addEventListener("click", () => {
     row.remove();
     showContactForm();
   });
+
   secondary.addEventListener("click", async () => {
     row.remove();
     intakePromptShown = false;
     await typeBotMessage(
       selectedAssistant.key === "ayumi"
-        ? "もちろんです。焦がずに大丈夫ですので、もう少しお話をうかがわせてください。"
-        : "承知しました。急がず進めましょう。続けて気になる点を話してください。"
+        ? "承知しました。焦がずに大丈夫ですので、もう少し一緒に整理していきましょう。"
+        : "ええよ。急がんでええけぇ、もう少し話してみん。"
     );
   });
+
   chatBody.appendChild(row);
   scrollToBottom();
 }
@@ -310,19 +321,25 @@ function showContactForm() {
   const card = document.createElement("div");
   card.className = "form-card";
   card.innerHTML = `
-    <div class="form-title">ご相談内容をお預かりするため、連絡先をご入力ください。</div>
+    <div class="form-title">ご相談内容をAUUへお預かりするため、連絡先をご入力ください。</div>
+
     <label class="field-label" for="company">会社名</label>
     <input id="company" class="form-input" type="text" placeholder="株式会社AUU" />
+
     <label class="field-label" for="name">お名前</label>
     <input id="name" class="form-input" type="text" placeholder="田中 雄介" />
+
     <label class="field-label" for="email">メールアドレス</label>
     <input id="email" class="form-input" type="email" placeholder="example@company.co.jp" />
+
     <div class="form-note">
       会話の内容は、整理した要約としてお預かりします。<br>
-      ご入力は 会社名・お名前・メールアドレス のみで大丈夫です。
+      ご入力は会社名・お名前・メールアドレスのみで大丈夫です。
     </div>
-    <button type="button" class="submit-button">はい、お願いします</button>
+
+    <button type="button" class="submit-button">この内容で送る</button>
   `;
+
   card.querySelector(".submit-button").addEventListener("click", submitConsultation);
   chatBody.appendChild(card);
   scrollToBottom();
@@ -356,8 +373,7 @@ async function submitConsultation() {
       throw new Error("Summary failed");
     }
 
-    const data = await response.json();
-    summaryPayload = data;
+    summaryPayload = await response.json();
   } catch (error) {
     summaryPayload = buildLocalSummary();
   } finally {
@@ -392,7 +408,7 @@ async function submitConsultation() {
   await typeBotMessage(
     selectedAssistant.key === "ayumi"
       ? "ありがとうございます。ご相談内容を整理した形でお預かりしました。内容を確認のうえ、担当よりご連絡いたします。"
-      : "ありがとうございます。ご相談内容を整理した形でお預かりしました。内容を確認のうえ、担当よりご連絡いたします。"
+      : "ありがとう。ご相談内容は整理した形で預かったけぇ、内容を確認して担当から連絡するな。"
   );
 
   const row = document.createElement("div");
@@ -411,13 +427,14 @@ function buildLocalSummary() {
     .filter((item) => item.role === "user")
     .map((item) => item.content);
 
+  const overview = userMessages[0] || "経営に関するご相談";
   const latestThree = userMessages.slice(-3).join(" / ");
-  const overview = userMessages[0] || "ビジネス上のお悩み相談";
+
   const summaryLines = [
     `【担当秘書】${selectedAssistant.name}`,
     `【相談概要】${overview}`,
-    `【本質的な課題（推定）】会話内容をもとに整理が必要な課題が複数あります。`,
-    latestThree ? `【会話メモ】${latestThree}` : "",
+    "【本質的な課題（推定）】会話内容をもとに、状況整理と優先順位づけが必要な課題があると考えられます。",
+    latestThree ? `【会話メモ】${latestThree}` : "【会話メモ】会話履歴の整理中です。",
     priorityTheme ? `【重点ヒアリング】${PRIORITY_THEME_LABELS[priorityTheme]}` : ""
   ].filter(Boolean);
 
@@ -447,6 +464,7 @@ function detectPriorityTheme(items) {
       return item.key;
     }
   }
+
   return "";
 }
 
@@ -467,7 +485,7 @@ function inferCategoryFromTheme(priorityTheme) {
     case "jobchange":
       return { category: "人材相談", subcategory: "転職・就職ニーズ" };
     default:
-      return { category: "AI秘書相談", subcategory: "自由相談" };
+      return { category: "経営相談", subcategory: "自由相談" };
   }
 }
 
@@ -491,7 +509,7 @@ async function typeBotMessage(text, persist = true) {
   const avatar = document.createElement("img");
   avatar.className = "avatar";
   avatar.src = selectedAssistant ? selectedAssistant.image : ASSISTANTS.ayumi.image;
-  avatar.alt = selectedAssistant ? selectedAssistant.name : "AI秘書";
+  avatar.alt = selectedAssistant ? selectedAssistant.name : "相談相手";
 
   const bubble = document.createElement("div");
   bubble.className = "message bot";
@@ -501,9 +519,11 @@ async function typeBotMessage(text, persist = true) {
   chatBody.appendChild(row);
 
   await typeTextIntoElement(bubble, text);
+
   if (persist) {
     conversation.push({ role: "assistant", content: text });
   }
+
   scrollToBottom();
 }
 
@@ -531,6 +551,11 @@ function appendLinkNote(text) {
 
 function typeTextIntoElement(element, text) {
   return new Promise((resolve) => {
+    if (!text) {
+      resolve();
+      return;
+    }
+
     let index = 0;
     const speed = 18;
 
@@ -538,6 +563,7 @@ function typeTextIntoElement(element, text) {
       element.textContent = text.slice(0, index + 1);
       scrollToBottom();
       index += 1;
+
       if (index < text.length) {
         window.setTimeout(step, speed);
       } else {

@@ -341,18 +341,16 @@ async function fetchAIReply() {
     conversation.push({ role: "assistant", content: data.reply });
   }
 
-  const userTurns = getUserTurnCount();
   const localPriorityTheme = detectPriorityTheme(conversation);
   const localCategoryMap = inferCategoryFromTheme(localPriorityTheme);
-  const concrete = hasConcreteConsultation();
 
   return {
     ...data,
     priorityTheme: data.priorityTheme || localPriorityTheme,
     category: data.category || localCategoryMap.category,
     subcategory: data.subcategory || localCategoryMap.subcategory,
-    shouldOfferChoices: Boolean(data.shouldOfferChoices) || (userTurns >= 7 && !concrete),
-    shouldOfferIntake: Boolean(data.shouldOfferIntake) || (userTurns >= 4 && concrete)
+    shouldOfferChoices: Boolean(data.shouldOfferChoices),
+    shouldOfferIntake: Boolean(data.shouldOfferIntake)
   };
 }
 
@@ -396,7 +394,7 @@ function buildFallbackReply(userText) {
   return {
     reply,
     shouldOfferIntake: userTurns >= 4 && concrete,
-    shouldOfferChoices: userTurns >= 7 && !concrete,
+    shouldOfferChoices: false,
     priorityTheme,
     category: categoryMap.category,
     subcategory: categoryMap.subcategory

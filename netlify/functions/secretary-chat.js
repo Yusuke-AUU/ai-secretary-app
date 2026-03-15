@@ -165,19 +165,33 @@ async function createChatReply(conversation, assistantId, assistantProfile) {
   const lastUserMessage = getLastUserMessage(conversation);
   const analysis = analyzeConversation(conversation);
   const lastAssistantAskedQuestion = didLastAssistantAskQuestion(conversation);
+  const hasBusinessBridgeAsked = hasAssistantAskedBusinessBridge(conversation, assistantId);
 
   const shouldBridgeToBusiness =
-    exchangeCount >= 5 &&
-    exchangeCount < 7 &&
-    !analysis.hasConsultIntent &&
-    !analysis.hasConcreteTheme &&
-    !lastAssistantAskedQuestion;
+    assistantId === "ayumi"
+      ? exchangeCount >= 5 &&
+        exchangeCount < 7 &&
+        !analysis.hasConsultIntent &&
+        !analysis.hasConcreteTheme &&
+        !lastAssistantAskedQuestion &&
+        !hasBusinessBridgeAsked
+      : exchangeCount >= 5 &&
+        exchangeCount < 7 &&
+        !analysis.hasConsultIntent &&
+        !analysis.hasConcreteTheme &&
+        !lastAssistantAskedQuestion;
 
   const shouldOfferChoices =
-    exchangeCount >= 7 &&
-    !analysis.hasConsultIntent &&
-    !analysis.hasConcreteTheme &&
-    !lastAssistantAskedQuestion;
+    assistantId === "ayumi"
+      ? exchangeCount >= 7 &&
+        !analysis.hasConsultIntent &&
+        !analysis.hasConcreteTheme &&
+        !lastAssistantAskedQuestion &&
+        hasBusinessBridgeAsked
+      : exchangeCount >= 7 &&
+        !analysis.hasConsultIntent &&
+        !analysis.hasConcreteTheme &&
+        !lastAssistantAskedQuestion;
 
   const shouldOfferIntake =
     analysis.hasConcreteTheme ||
@@ -241,6 +255,7 @@ ${bridgeInstruction}
 経営相談の意図あり: ${analysis.hasConsultIntent ? "yes" : "no"}
 具体テーマあり: ${analysis.hasConcreteTheme ? "yes" : "no"}
 直前のAI発話は質問で終わっている: ${lastAssistantAskedQuestion ? "yes" : "no"}
+過去に経営相談への橋渡し質問をした: ${hasBusinessBridgeAsked ? "yes" : "no"}
 ユーザー最新発言: ${lastUserMessage || "なし"}
 `.trim();
 
@@ -358,6 +373,22 @@ function didLastAssistantAskQuestion(conversation) {
 
   const lastAssistantMessage = assistantMessages[assistantMessages.length - 1].content || "";
   return /[？?]\s*$/.test(lastAssistantMessage.trim());
+}
+
+function hasAssistantAskedBusinessBridge(conversation, assistantId) {
+  const assistantMessages = conversation
+    .filter((item) => item.role === "assistant")
+    .map((item) => item.content || "");
+
+  if (assistantId === "noriko") {
+    return assistantMessages.some((text) =>
+      /ところで、仕事や経営で気になっとることはない[？?]/.test(text)
+    );
+  }
+
+  return assistantMessages.some((text) =>
+    /ところで、経営に関するお悩みはありませんか[？?]/.test(text)
+  );
 }
 
 function enforceBusinessBridge(reply, assistantId) {

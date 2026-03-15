@@ -163,7 +163,6 @@ function closeChat() {
 }
 
 function resetToSelection() {
-  document.body.classList.add("selection-screen");
   selectedAssistant = null;
   conversation = [];
   intakePromptShown = false;
@@ -225,7 +224,6 @@ function createSecretaryCard(assistant) {
 }
 
 async function startConversation(assistantKey) {
-  document.body.classList.remove("selection-screen");
   selectedAssistant = ASSISTANTS[assistantKey];
   conversation = [];
   intakePromptShown = false;

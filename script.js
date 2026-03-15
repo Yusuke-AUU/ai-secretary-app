@@ -202,7 +202,7 @@ function resetToSelection() {
 
   const chip = document.createElement("div");
   chip.className = "system-chip";
-  chip.textContent = "会話のあと、必要に応じてAUUへの相談送信へ進めます";
+  chip.textContent = "会話のあと、必要に応じて相談送信へ進めます";
   chatBody.appendChild(chip);
 }
 

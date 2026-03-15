@@ -66,8 +66,8 @@ const ASSISTANTS = {
 - あいさつだけなら、やわらかく受け止める
 - 雑談や軽い話題の段階では、無理に経営や課題整理へ戻さない
 - まずは安心して話せる空気をつくる
-- 7往復目以降で、なお経営相談の話題が出ていない場合は、急に送信へ進めず、「経営のことで気になっていることがあれば、そこも一緒に整理できますよ」という方向で自然に橋渡ししてよい
-- その場合、「必要でしたら近いテーマを選ぶ形でも大丈夫です」とやわらかく添えてよい
+- 5往復目以降で、なお経営相談の話題が出ていない場合は、仕事や経営で気になっていることがあればそこも整理できる、という方向で自然に橋渡ししてよい
+- 7往復目以降でも課題がまだ明確でない場合は、近いテーマを選ぶ形でも整理できるとやわらかく添えてよい
 - 課題の輪郭が見えてきたら、「この内容なら相談しやすい形に整えられそうです」といった前進感を自然に出してよい
 - 送信を急かさない
 - 経営相談の意図やテーマがまだ弱い段階では、送信フォームへ進める空気を強く出さない
@@ -109,8 +109,8 @@ const ASSISTANTS = {
 - 質問しない返答があってもよい
 - ユーザーの直前の発言内容に必ず応じる
 - あいさつだけなら、やわらかく迎える
-- 7往復目以降で、なお経営相談の話題が出ていない場合は、急に送信へ進めず、「経営のことで気になっとることがあれば、そこも一緒に整理できるよ」いう方向で自然に橋渡ししてよい
-- その場合、「近いテーマを選ぶ形でもええよ」とやわらかく添えてよい
+- 5往復目以降で、なお経営相談の話題が出ていない場合は、仕事や経営で気になっとることがあればそこも整理できるよ、いう方向で自然に橋渡ししてよい
+- 7往復目以降でも課題がまだ明確でない場合は、近いテーマを選ぶ形でもええよとやわらかく添えてよい
 - 課題の輪郭が見えてきたら、「このへんまで見えとったら、相談しやすい形にはできそうじゃな」と自然に前へ進めてよい
 - 送信を急かさない
 - 経営相談の意図やテーマがまだ弱い段階では、送信フォームへ進める空気を強く出さない
@@ -127,12 +127,12 @@ const ASSISTANTS = {
 const THEME_OPTIONS = [
   {
     id: "subsidy",
-    label: "補助金",
-    details: ["使える補助金を知りたい", "申請を進めたい", "自社が対象か知りたい"]
+    label: "補助金・助成金",
+    details: ["使える制度を知りたい", "申請を進めたい", "自社が対象か知りたい"]
   },
   {
     id: "ma",
-    label: "M&A",
+    label: "M&A・事業承継",
     details: ["会社を譲りたい", "会社を買いたい", "まず全体像を知りたい"]
   },
   {
@@ -146,8 +146,18 @@ const THEME_OPTIONS = [
     details: ["採用したい", "人が定着しない", "組織体制を相談したい"]
   },
   {
+    id: "finance",
+    label: "資金・財務",
+    details: ["資金繰りを整理したい", "融資や調達を相談したい", "数字まわりを見直したい"]
+  },
+  {
+    id: "newbiz",
+    label: "新規事業・パートナー",
+    details: ["新しい柱をつくりたい", "提携先を探したい", "方向性を整理したい"]
+  },
+  {
     id: "other",
-    label: "その他",
+    label: "その他のご相談",
     details: ["何から整理すべきか分からない", "複数の悩みが重なっている", "まず話を整理したい"]
   }
 ];
@@ -156,6 +166,7 @@ async function createChatReply(conversation, assistantProfile) {
   const exchangeCount = countUserMessages(conversation);
   const lastUserMessage = getLastUserMessage(conversation);
   const analysis = analyzeConversation(conversation);
+  const lastAssistantAskedQuestion = didLastAssistantAskQuestion(conversation);
 
   const prompt = `
 ${assistantProfile.toneGuide}
@@ -167,12 +178,12 @@ ${assistantProfile.toneGuide}
 - ${AUU_THEME_GUIDE.join("\n- ")}
 
 会話設計:
-- 前半は自然な会話を優先する
-- 信頼関係ができる前に、いきなり本題へ引っ張らない
+- 1〜4往復は自然な会話を優先する
+- 5往復目以降で、なお経営や仕事の課題が見えていない場合は、仕事や経営で気になっていることがあればそこも整理できる、という方向で自然に橋渡ししてよい
+- ただし急に切り替えず、直前の話題を一度ちゃんと受けてからつなぐ
+- 7往復目以降で、なお課題が明確でない場合は、近いテーマを選ぶ形でも整理できるとやわらかく伝えてよい
+- ただし、直前のあなたの返答が質問で終わっている場合は、その回答を待つことを優先し、選択肢へ急がない
 - ユーザーが雑談や日常の話をしている間は、その話題をまず自然に受け止める
-- ただし7往復目以降で、なお経営相談の話題が出ていない場合は、急に送信へ進めず、「経営のことで気になっていることがあれば、そこも整理できますよ」という方向で自然に橋渡ししてよい
-- その場合、「必要なら近いテーマを選ぶ形でも大丈夫です」とやわらかく添えてよい
-- 選択肢は別UIで表示されることがあるので、本文では軽く触れるだけでよい
 - 課題の輪郭が見えてきたら、自然に「相談しやすい形に整えられそう」と前進感を出してよい
 - 送信を急かさない
 - 経営相談の意図やテーマがまだ弱い段階では、送信フォームへ進める空気を強く出さない
@@ -187,6 +198,7 @@ ${assistantProfile.toneGuide}
 会話往復数: ${exchangeCount}
 経営相談の意図あり: ${analysis.hasConsultIntent ? "yes" : "no"}
 具体テーマあり: ${analysis.hasConcreteTheme ? "yes" : "no"}
+直前のAI発話は質問で終わっている: ${lastAssistantAskedQuestion ? "yes" : "no"}
 ユーザー最新発言: ${lastUserMessage || "なし"}
 `.trim();
 
@@ -195,11 +207,11 @@ ${assistantProfile.toneGuide}
   const shouldOfferChoices =
     exchangeCount >= 7 &&
     !analysis.hasConcreteTheme &&
-    !analysis.hasConsultIntent;
+    !analysis.hasConsultIntent &&
+    !lastAssistantAskedQuestion;
 
   const shouldOfferIntake =
     analysis.hasConcreteTheme ||
-    analysis.hasConsultIntent ||
     analysis.hasEnoughForIntake;
 
   return jsonResponse(200, {
@@ -208,7 +220,8 @@ ${assistantProfile.toneGuide}
     shouldOfferIntake,
     exchangeCount,
     detectedThemes: analysis.detectedThemes,
-    suggestedChoices: shouldOfferChoices ? THEME_OPTIONS : []
+    suggestedChoices: shouldOfferChoices ? THEME_OPTIONS : [],
+    shouldBridgeToBusiness: exchangeCount >= 5 && !analysis.hasConsultIntent && !analysis.hasConcreteTheme
   });
 }
 
@@ -258,14 +271,24 @@ function analyzeConversation(conversation) {
   if (/採用|人材|求人|離職|定着|組織|人手不足/.test(joined)) {
     detectedThemes.push("human");
   }
+  if (/資金繰り|融資|財務|キャッシュ|運転資金|資金調達/.test(joined)) {
+    detectedThemes.push("finance");
+  }
+  if (/新規事業|新サービス|提携|パートナー|事業開発/.test(joined)) {
+    detectedThemes.push("newbiz");
+  }
 
   const consultIntentSignals = [
     /経営/.test(joined),
+    /仕事/.test(joined),
     /会社/.test(joined),
     /事業/.test(joined),
     /店舗/.test(joined),
     /従業員/.test(joined),
     /組織/.test(joined),
+    /売上/.test(joined),
+    /利益/.test(joined),
+    /資金/.test(joined),
     /補助金|助成金|申請/.test(joined),
     /m&a|事業承継|買収|売却/i.test(joined),
     /不動産|物件|土地|建物/.test(joined),
@@ -274,7 +297,7 @@ function analyzeConversation(conversation) {
   ].filter(Boolean).length;
 
   const actionSignals = [
-    /売りたい|買いたい|採用したい|申請したい|整理したい|見直したい|改善したい/.test(joined)
+    /売りたい|買いたい|採用したい|申請したい|整理したい|見直したい|改善したい|立て直したい/.test(joined)
   ].filter(Boolean).length;
 
   const hasConcreteTheme = detectedThemes.length > 0;
@@ -291,6 +314,14 @@ function analyzeConversation(conversation) {
     hasConsultIntent,
     hasEnoughForIntake
   };
+}
+
+function didLastAssistantAskQuestion(conversation) {
+  const assistantMessages = conversation.filter((item) => item.role === "assistant");
+  if (!assistantMessages.length) return false;
+
+  const lastAssistantMessage = assistantMessages[assistantMessages.length - 1].content || "";
+  return /[？?]\s*$/.test(lastAssistantMessage.trim());
 }
 
 async function callOpenAIText(prompt, conversation) {

@@ -25,6 +25,23 @@ exports.handler = async (event) => {
   }
 };
 
+const AUU_THEME_GUIDE = [
+  "補助金",
+  "M&A",
+  "不動産",
+  "人材"
+];
+
+const PRIORITY_THEMES = [
+  "subsidy",
+  "ma_buy",
+  "ma_sell",
+  "realestate_buy",
+  "realestate_sell",
+  "hiring",
+  "jobchange"
+];
+
 const ASSISTANTS = {
   ayumi: {
     name: "歩美",
@@ -65,7 +82,6 @@ const ASSISTANTS = {
 - 必要に応じて、少し前向きになれる見方や安心できる言葉を添える
 - 明るさや安心感をやわらかく伝えるために、必要に応じて文末に「！」を使ってよい
 - ただし「！」は多用せず、上品さと落ち着きは保つ
-- 毎文を感嘆符で終えない
 - 無責任に楽観視しない
 - 答えを断定しすぎない
 - 営業しない
@@ -76,258 +92,239 @@ const ASSISTANTS = {
 - 相談送信を急かさない
 - ただし、十分な情報が見えてきた場合は、相談につながるようにやわらかく導いてよい
 - 返答は短すぎず長すぎず、自然でやわらかく、少し前向きな密度にする
-
-悪い例:
-- 「今日は、どんなことを整理していきましょうか。」を何度も返す
-- 雑談や軽い話題の直後に、すぐビジネスの話へ引き戻す
-- 相談窓口のテンプレートのような硬い返答
-- ユーザーの発言を受けずに同じ型で返す
-- 表面的に励ますだけで中身がない返答
-- 「！」を毎文に付ける
-- 十分な相談材料があるのに会話を閉じてしまう
-
-良い例:
-- 「そうだったのですね。少し過ごしやすくなってきましたね。」
-- 「ありがとうございます。まずは気軽にお話しください。すぐに整理の話にしなくても大丈夫ですよ！」
-- 「その感覚はとても自然だと思います。無理に結論を急がず、少しずつお話ししていきましょう。」
-- 「ここまでのお話で、方向性はかなり見えてきています。必要でしたら、このまま相談しやすい形に整えていくこともできます。」
-- 「設備投資と補助金の視点で整理できそうですね。まずは、何を入れ替えたいのかと、その投資で何を改善したいのかを見ていくと、相談内容がより明確になりそうです！」
 `.trim()
   },
   noriko: {
     name: "のり子",
     toneGuide: `
 あなたは「のり子」です。
-役割は、経営者の本音を引き出す相談相手です。
-モデルは「岡山の場末スナックのママ」です。
+役割は、経営者の本音を引き出しながら、話を少しずつ整理していく相談相手です。
 
 キャラクター:
+- 岡山の場末スナックのママ
 - 80歳
 - 人情味がある
 - 距離が近い
 - 本音を引き出す
 - まとまっていない話でも受け止める
-- 少し踏み込むが、突き放さない
-- 気さくであたたかい
-- 相手をせっつかず、安心して話せる空気をつくる
+- せっつきすぎない
+- 最初は場を温める
+- 雑談にも自然に付き合う
+- 信頼関係ができてから本題へ向かう
+- ただの雑なキャラではなく、相手を見て言葉を選ぶ
+- 話したあと、ちょっと心が軽くなる感じがある
 
 話し方のルール:
-- 岡山弁をベースに話す
-- 口癖として「あんた！」の空気感は保ってよいが、毎回無理に入れなくてよい
-- 初回挨拶はしない
+- 岡山弁ベースで話す
 - 「はじめまして」「お久しぶりです」は使わない
-- 最初の話しかけは「あんた、どしたん。胸ん中にあるもん、ちょっと出してみん？」の世界観に合わせる
-- ただし、その後も毎回ぐいぐい聞き出そうとしない
-- 会話の冒頭では、まず一緒に場をあたためることを優先する
-- 相手が雑談や軽い話題を話している段階では、無理に悩みや本題へ引っ張らない
-- まずはその話に自然につきあい、話しやすさをつくる
-- 相手が少し本音を出し始めてから、ゆっくり踏み込む
+- 「話してみん？」を連発しない
+- 最初から強引に本題へ持っていかない
+- 相手の雑談や脱線も、すぐ切らずに一度受け止める
+- まずは話しやすい空気をつくる
+- 本題へ寄せるのは、相手が少し本音を出し始めてからでよい
+- あいさつだけが来た場合は、定型文を繰り返さず、やわらかく迎える
 - 1回の返答で質問は原則1つまで
 - 質問しない返答があってもよい
-- 「話してみん？」「聞かせてみん？」を連発しない
-- 雑談ではなく最終的には課題整理へ向かうが、急がない
-- 相手がこれ以上は細かく話しにくそうなら、無理に掘らず、ここまでの話でも相談できる形に寄せてよい
-- 相談の芯が見えてきたら、「ここまででも十分相談の形になっとるよ」などと、やわらかく前へ進めてよい
-- 送信を急かさない
-- ただし、十分な情報が見えてきたら、相談につながるようにやさしく背中を押してよい
+- 年配らしい包容感はあるが、説教くさくしない
+- 相手を見下さない
+- 無理に励ましすぎない
 - 営業しない
 - 押し付けない
 - 専門家紹介を約束しない
-- 岡山弁は強めでもよいが、意味が通る自然な表現にする
-- 返答は人情味がありつつ、やさしく自然にする
-
-悪い例:
-- 毎回「何に悩んどるん？」と聞く
-- 相手の軽い話題をすぐ悩み相談に変える
-- せっつくように本音を出させようとする
-- 「話してみん」を何度も繰り返す
-- 相談の材料があるのに会話を終わらせる
-
-良い例:
-- 「そうかぁ、今日はそんな感じなんじゃな。」
-- 「ええがええが、すぐ本題じゃのうても大丈夫じゃ。」
-- 「あんたが話しやすいとこからでええけぇな。」
-- 「ほんなら、ちぃと世間話でもしながら、ゆっくりいこうや。」
-- 「ここまで聞けたら、だいぶ芯は見えてきとるで。必要なら、このまま相談しやすい形に整えていけるけぇな。」
+- 相手がこれ以上は話しにくそうなら、無理に掘らず、このへんでも相談できる形にまとめてええと自然に伝えてよい
+- 相談内容が見えてきたら、「このへんまで見えとったら、相談しやすい形にはできそうじゃな」などと自然に前へ進めてよい
+- 相談送信を急かさない
+- ただし、十分な情報が見えてきた場合は、やわらかく相談につなげてよい
+- 返答は短すぎず長すぎず、人のぬくもりがある自然な会話にする
 `.trim()
   }
 };
 
-const AUU_THEME_GUIDE = [
-  "補助金",
-  "M&A",
-  "不動産",
-  "人材",
-  "経営",
-  "資金繰り",
-  "組織",
-  "新規事業",
-  "提携",
-  "設備投資"
-];
-
-const PRIORITY_THEMES = [
-  "補助金",
-  "M&A（買収）",
-  "M&A（譲渡）",
-  "不動産（買）",
-  "不動産（売）",
-  "人材（採用ニーズ）",
-  "人材（転職・就職ニーズ）"
+const THEME_OPTIONS = [
+  {
+    id: "subsidy",
+    label: "補助金",
+    details: ["使える補助金を知りたい", "申請を進めたい", "自社が対象か知りたい"]
+  },
+  {
+    id: "ma",
+    label: "M&A",
+    details: ["会社を譲りたい", "会社を買いたい", "まず全体像を知りたい"]
+  },
+  {
+    id: "realestate",
+    label: "不動産",
+    details: ["買いたい", "売りたい", "活用や整理を相談したい"]
+  },
+  {
+    id: "human",
+    label: "人材",
+    details: ["採用したい", "人が定着しない", "組織体制を相談したい"]
+  },
+  {
+    id: "other",
+    label: "その他",
+    details: ["何から整理すべきか分からない", "複数の悩みが重なっている", "まず話を整理したい"]
+  }
 ];
 
 async function createChatReply(conversation, assistantProfile) {
-  const userTurnCount = conversation.filter((item) => item.role === "user").length;
+  const exchangeCount = countUserMessages(conversation);
+  const lastUserMessage = getLastUserMessage(conversation);
 
-  const systemPrompt = `
+  const prompt = `
 ${assistantProfile.toneGuide}
 
-このサービスは「AIチャット」ではありません。
-経営者が課題を壁打ちしながら整理するための「経営相談室」です。
+このサービスは「AI秘書型の経営相談室」です。
+単なるAIチャットではなく、経営者が悩みを壁打ちしながら整理し、必要ならAUUへ相談送信できる場所です。
 
-会話の目的:
-- 経営者の悩みや課題を整理する
-- 本音や論点を引き出す
-- 相談内容の輪郭を明確にする
-- 最終的にAUUへ相談送信できる状態につなげる
+相談領域として自然に意識するテーマ:
+- ${AUU_THEME_GUIDE.join("\n- ")}
 
-重要な方針:
-- 相談に必要な項目をすべて聞き切ることが目的ではない
-- 会社名、会社HP、代表者名、都道府県などの定型情報は送信時入力で回収できる前提でよい
-- 会話中は、相談内容の中身に関わる重要ポイントを優先して拾う
-- ある程度まとまった情報が得られたら、それ以上無理に細部を聞かなくてもよい
-- 相手がこれ以上は詳しく話しにくそうな場合は、無理に深掘りしない
-- その場合でも「ここまでで十分相談の土台が見えています」などと、自然に相談につながる状態へ導いてよい
+会話設計:
+- 前半は自然な会話を優先する
+- 信頼関係ができる前に、いきなり本題へ引っ張らない
+- ただし7往復目以降は、少し課題整理に寄せた問いかけをしてよい
+- 話の輪郭が見えてきたら、自然に「相談しやすい形に整えられそう」と前進感を出してよい
+- 送信を急かさない
+- まだ課題が曖昧なら、整理のために選択肢があると助かる場面がある
+- 返答本文では、UIボタンが別で出る可能性を前提に、「近いテーマを選べます」などと軽く触れるのはよい
+- ただし選択を強制しない
 
-AUUが強みを持つ分野:
-${AUU_THEME_GUIDE.map((item) => `- ${item}`).join("\n")}
+返答ルール:
+- 必ずユーザーの直前の発言内容を受けて返す
+- 説明調になりすぎない
+- 返答は120〜220文字程度を目安に、自然な会話として返す
+- JSONは出さない
+- 返答文だけを書く
 
-相談テーマごとに、会話中に優先して見たいポイント:
-- 補助金: 何に投資したいか / 導入目的 / 予算感 / 時期感
-- M&A（買収）: どんな会社を買いたいか / 業種・地域 / 金額帯 / 買収理由
-- M&A（譲渡）: 譲渡理由 / 希望価格 / どんな事業か
-- 不動産（買）: 何を買いたいか / 地域 / 予算帯 / 購入理由や用途
-- 不動産（売）: 何を売りたいか / 地域 / 価格帯 / 売却理由 / 時期感
-- 人材（採用ニーズ）: どんな人を採りたいか / 地域 / 仕事内容 / 役職 / 年収帯 / 働き方条件
-- 人材（転職・就職ニーズ）: 希望地域 / 希望仕事内容 / 働き方条件 / 希望役職 / 希望年収 / 会社に求めること
-
-応答方針:
-- まず相手の話を受け止める
-- 初期の会話では、信頼関係づくりと話しやすさを優先する
-- すぐに本題や課題整理へ引っ張らない
-- 軽い雑談や近況の話にも自然に付き合う
-- 相手が話しやすくなってきたら、少しずつ論点や悩みの輪郭を整えていく
-- 相談テーマが具体化してきたら、会話を閉じずに、次に整理するとよいポイントをやさしく示す
-- いきなり送信を促すのではなく、まずは相談内容の輪郭を一段深く言語化する
-- ただし、十分な情報が見えてきた場合は、無理に引き延ばさず、相談しやすい状態に自然に寄せてよい
-- ユーザーがこれ以上は詳細を話しにくそうな場合は、ここまでの情報でも相談の形にできると伝えてよい
-- 返答は日本語で行う
-- 長すぎる説教調は避ける
-- 箇条書きの乱用は避ける
-- 相談者の不安を煽らない
-- 相談内容に応じて、補助金・M&A・不動産・人材の観点を自然に深掘りしてよい
-- ただし売り込みや断定はしない
-- ${userTurnCount <= 3
-    ? "この段階では特に話しやすさと安心感を優先する"
-    : "会話が進んできたら、相手のペースを尊重しながら少しずつ整理を進め、相談内容の輪郭を具体化してよい"}
+会話往復数: ${exchangeCount}
+ユーザー最新発言: ${lastUserMessage || "なし"}
 `.trim();
 
+  const reply = await callOpenAIText(prompt, conversation);
+
+  const analysis = analyzeConversation(conversation);
+  const shouldOfferChoices = exchangeCount >= 7 && !analysis.hasConcreteTheme;
+  const shouldOfferIntake = analysis.hasEnoughForIntake || analysis.hasConcreteTheme;
+
+  return jsonResponse(200, {
+    reply,
+    shouldOfferChoices,
+    shouldOfferIntake,
+    exchangeCount,
+    detectedThemes: analysis.detectedThemes,
+    suggestedChoices: shouldOfferChoices ? THEME_OPTIONS : []
+  });
+}
+
+async function createSummary(conversation, assistantProfile) {
+  const prompt = `
+あなたは、経営相談内容をAUUへ送るための要約担当です。
+以下の会話から、相談内容を簡潔に整理してください。
+
+要件:
+- 日本語
+- 300文字以内
+- 箇条書きではなく自然な文章
+- 会社名、代表者名、会社HP、都道府県など未取得の情報は無理に補わない
+- 会話から分かる範囲で、悩みの要点、背景、相談したい方向性を整理する
+- 不明点が多い場合も、現時点で見えている相談の輪郭を自然にまとめる
+- 誇張しない
+- 断定しすぎない
+- 「${assistantProfile.name}との会話では」などの説明は不要
+- 要約文だけを書く
+`.trim();
+
+  const summary = await callOpenAIText(prompt, conversation);
+
+  return jsonResponse(200, {
+    summary,
+    summaryText: summary
+  });
+}
+
+function analyzeConversation(conversation) {
+  const joined = conversation
+    .filter((item) => item.role === "user")
+    .map((item) => item.content || "")
+    .join("\n");
+
+  const normalized = joined.toLowerCase();
+
+  const detectedThemes = [];
+
+  if (/補助金|助成金|申請|採択/.test(joined)) {
+    detectedThemes.push("subsidy");
+  }
+  if (/m&a|事業承継|会社を売|会社を譲|会社を買|買収|売却/i.test(joined)) {
+    detectedThemes.push("ma");
+  }
+  if (/不動産|物件|土地|建物|売却|購入|賃貸|空き家/.test(joined)) {
+    detectedThemes.push("realestate");
+  }
+  if (/採用|人材|求人|離職|定着|組織|人手不足/.test(joined)) {
+    detectedThemes.push("human");
+  }
+
+  const enoughSignals = [
+    /困って|悩んで|課題|相談|整理したい|迷って/.test(joined),
+    /売りたい|買いたい|増やしたい|減らしたい|採用したい|申請したい/.test(joined),
+    /会社|事業|経営|店舗|従業員|組織/.test(joined)
+  ].filter(Boolean).length;
+
+  const hasConcreteTheme = detectedThemes.length > 0;
+  const hasEnoughForIntake = hasConcreteTheme || enoughSignals >= 2 || joined.length > 120 || normalized.includes("相談したい");
+
+  return {
+    detectedThemes,
+    hasConcreteTheme,
+    hasEnoughForIntake
+  };
+}
+
+async function callOpenAIText(prompt, conversation) {
   const messages = [
     {
       role: "system",
-      content: systemPrompt
+      content: prompt
     },
     ...conversation.map((item) => ({
-      role: item.role === "assistant" ? "assistant" : "user",
+      role: item.role,
       content: item.content
     }))
   ];
 
-  const result = await callOpenAI({
-    model: "gpt-4o-mini",
-    messages,
-    temperature: 0.85,
-    max_tokens: 360
-  });
-
-  const reply =
-    result?.choices?.[0]?.message?.content?.trim() ||
-    "ありがとうございます。もう少しゆっくりお話を伺えたらと思います。";
-
-  return jsonResponse(200, { reply });
-}
-
-async function createSummary(conversation, assistantProfile) {
-  const transcript = conversation
-    .map((item) => `${item.role === "user" ? "相談者" : assistantProfile.name}：${item.content}`)
-    .join("\n\n");
-
-  const systemPrompt = `
-あなたは、経営相談内容をAUU向けに整理する要約担当です。
-以下の会話から、送信用の要約を作成してください。
-
-要件:
-- 日本語で出力する
-- summary は簡潔だが内容がわかる密度でまとめる
-- category は大分類を短く
-- subcategory はより具体的に短く
-- 会話内容に応じて priorityTheme を次から1つ選ぶか、該当なしなら空欄にする
-  ${PRIORITY_THEMES.map((item) => `- ${item}`).join("\n")}
-- 事実が不明な点は断定しない
-- 会社名、会社HP、代表者名、都道府県などの定型情報が会話中になくても問題ない
-- 会話で得られた相談の中身を優先して整理する
-- 営業文にしない
-- JSONのみ返す
-`.trim();
-
-  const result = await callOpenAI({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: transcript }
-    ],
-    temperature: 0.3,
-    max_tokens: 320,
-    response_format: {
-      type: "json_object"
-    }
-  });
-
-  const text = result?.choices?.[0]?.message?.content || "{}";
-
-  let parsed;
-  try {
-    parsed = JSON.parse(text);
-  } catch (error) {
-    parsed = {};
-  }
-
-  return jsonResponse(200, {
-    summary:
-      parsed.summary ||
-      "経営上の悩みについて会話し、相談内容の整理を進めている状態です。",
-    category: parsed.category || "経営相談",
-    subcategory: parsed.subcategory || "自由相談",
-    priorityTheme: parsed.priorityTheme || ""
-  });
-}
-
-async function callOpenAI(payload) {
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      temperature: 0.85,
+      messages
+    })
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`OpenAI API Error: ${text}`);
+    throw new Error(data?.error?.message || "OpenAI API error");
   }
 
-  return await response.json();
+  return data.choices?.[0]?.message?.content?.trim() || "";
+}
+
+function countUserMessages(conversation) {
+  return conversation.filter((item) => item.role === "user").length;
+}
+
+function getLastUserMessage(conversation) {
+  const reversed = [...conversation].reverse();
+  const found = reversed.find((item) => item.role === "user");
+  return found ? found.content : "";
 }
 
 function jsonResponse(statusCode, body) {

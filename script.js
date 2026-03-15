@@ -19,7 +19,7 @@ const ASSISTANTS = {
     image: "ayumi.png",
     shortHeader: "歩美と相談中",
     subtitle: "やさしく整理します",
-    selectionCopy: "知的で前向きな対話で、考えやお悩みを優しく整理します。",
+    selectionCopy: "知的で前向きな対話で、考えや悩みを優しく整えます。",
     cta: "やさしく整理します",
     intro: "今日は、どんなことを整理していきましょうか。",
     intakeLine: "ここまでのお話を整理すると、相談内容の輪郭が見えてきました。必要でしたら、この内容を整理した形でお預かりできます。",
@@ -32,7 +32,7 @@ const ASSISTANTS = {
     image: "noriko.png",
     shortHeader: "のり子と相談中",
     subtitle: "あんた！話してみい",
-    selectionCopy: "まとまっとらんでもええけぇ、本音や引っかかりを話せます。",
+    selectionCopy: "まとまらんでもええけぇ、本音や引っかかり話せます。",
     cta: "あんた！話してみい",
     intro: "あんた、どしたん。胸ん中にあるもん、ちょっと出してみん？",
     intakeLine: "ここまで聞いたら、だいぶ芯が見えてきたが。必要なら、この内容を整理した形で預かれるで。",
@@ -188,8 +188,8 @@ function resetToSelection() {
   intro.innerHTML = `
     <div class="intro-title">相談相手を選んでください</div>
     <div class="intro-text">
-      経営の悩みが、うまく整理できていなくても大丈夫です。<br>
-      歩美とのり子が、それぞれ悩みや本音を整理します。
+      経営の悩みが整理できていなくても大丈夫です。<br>
+      歩美とのり子が、悩みや本音を整理します。
     </div>
   `;
   chatBody.appendChild(intro);

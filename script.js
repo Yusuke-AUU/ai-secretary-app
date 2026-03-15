@@ -145,15 +145,21 @@ chatInput.addEventListener("keydown", (event) => {
   }
 });
 
+openChat();
+
 function openChat() {
   chatBox.hidden = false;
+  chatLauncher.hidden = true;
   chatLauncher.setAttribute("aria-expanded", "true");
+  document.body.classList.add("chat-home");
   resetToSelection();
 }
 
 function closeChat() {
   chatBox.hidden = true;
+  chatLauncher.hidden = false;
   chatLauncher.setAttribute("aria-expanded", "false");
+  document.body.classList.remove("chat-home");
 }
 
 function resetToSelection() {

@@ -10,13 +10,13 @@
   />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="chat-home">
   <div class="page-glow page-glow-left"></div>
   <div class="page-glow page-glow-right"></div>
 
   <button
     id="chatLauncher"
-    class="chat-launcher"
+    class="chat-launcher" hidden
     type="button"
     aria-controls="chatBox"
     aria-expanded="false"
@@ -24,7 +24,7 @@
     経営相談室をひらく
   </button>
 
-  <section id="chatBox" class="chat-box" aria-label="経営相談室" hidden>
+  <section id="chatBox" class="chat-box" aria-label="経営相談室">
     <header class="chat-header">
       <div class="chat-header-main">
         <img id="headerAvatar" class="header-avatar" src="ayumi.png" alt="" />

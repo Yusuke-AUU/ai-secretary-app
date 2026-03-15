@@ -42,6 +42,27 @@ body {
   overflow-x: hidden;
 }
 
+body.chat-home {
+  padding: 24px 12px 18px;
+}
+
+body.chat-home .chat-box {
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  transform: none;
+  width: min(100%, 460px);
+  height: min(84vh, 760px);
+  margin: 0 auto;
+}
+
+body.chat-home .chat-launcher {
+  display: none;
+}
+
+
 .page-glow {
   position: fixed;
   width: 32vw;
@@ -559,6 +580,16 @@ body {
 }
 
 @media (max-width: 768px) {
+
+  body.chat-home {
+    padding: 8px;
+  }
+
+  body.chat-home .chat-box {
+    width: 100% !important;
+    height: min(86dvh, 760px);
+    margin: 0;
+  }
   .chat-launcher {
     right: 14px;
     bottom: 14px;

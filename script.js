@@ -22,7 +22,8 @@ const ASSISTANTS = {
     selectionCopy: "知的で落ち着いた対話で、考えや論点をやさしく整理します。",
     cta: "やさしく整理します",
     intro: "今日は、どんなことを整理していきましょうか。",
-    intakeLine: "ここまでのお話を整理すると、相談内容の輪郭が見えてきました。必要でしたら、この内容を整理した形でお預かりできます。"
+    intakeLine: "ここまでのお話を整理すると、相談内容の輪郭が見えてきました。必要でしたら、この内容を整理した形でお預かりできます。",
+    choiceLead: "いくつか近いテーマを並べてみますね。近いものがあれば、お選びください。"
   },
   noriko: {
     key: "noriko",
@@ -34,8 +35,80 @@ const ASSISTANTS = {
     selectionCopy: "まとまっとらんでもええけぇ、本音や引っかかりを遠慮なく話せます。",
     cta: "あんた！まず話してみん",
     intro: "あんた、どしたん。胸ん中にあるもん、ちょっと出してみん？",
-    intakeLine: "ここまで聞いたら、だいぶ芯が見えてきたが。必要なら、この内容を整理した形で預かれるで。"
+    intakeLine: "ここまで聞いたら、だいぶ芯が見えてきたが。必要なら、この内容を整理した形で預かれるで。",
+    choiceLead: "いまの話やと、このへんが近そうじゃな。近いもんがあったら選んでみん？"
   }
+};
+
+const CATEGORY_CHOICES = {
+  "M&A・事業承継": [
+    "後継者不在で悩んでいる",
+    "会社の売却を検討している",
+    "買収を考えている",
+    "第三者への承継を相談したい",
+    "その他のM&A・事業承継に関すること"
+  ],
+  "補助金・助成金": [
+    "新規事業や設備投資の予定がある",
+    "どの補助金・助成金が使えるか知りたい",
+    "専門家に申請手続きをサポートしてほしい",
+    "事業計画書の作成を相談したい",
+    "その他の補助金・助成金に関すること"
+  ],
+  "不動産": [
+    "不動産の購入を検討している",
+    "不動産の売却を検討している",
+    "収益物件や事業用物件の相談をしたい",
+    "遊休資産の活用を相談したい",
+    "その他の不動産に関すること"
+  ],
+  "人材": [
+    "人材の採用で困っている",
+    "定着率や離職率を改善したい",
+    "組織体制を見直したい",
+    "幹部候補や専門人材を探したい",
+    "その他の人材に関すること"
+  ],
+  "資金・財務": [
+    "融資や資金繰りで悩んでいる",
+    "節税や税務対策について相談したい",
+    "財務改善や分析をしたい",
+    "出資や投資の相談をしたい",
+    "その他の資金・財務に関すること"
+  ],
+  "新規事業・パートナー": [
+    "新しい事業の立ち上げを考えている",
+    "パートナーや協業先を探している",
+    "専門家を紹介してほしい",
+    "補助金や設備投資も絡めて相談したい",
+    "その他の新規事業・パートナーに関すること"
+  ],
+  "その他のご相談": [
+    "経営全般の相談をしたい",
+    "何から相談してよいか分からない",
+    "自社に合う支援を知りたい",
+    "外部専門家の紹介を受けたい",
+    "その他のご相談"
+  ]
+};
+
+const SUBCATEGORY_THEME_MAP = {
+  "新規事業や設備投資の予定がある": "subsidy",
+  "どの補助金・助成金が使えるか知りたい": "subsidy",
+  "専門家に申請手続きをサポートしてほしい": "subsidy",
+  "事業計画書の作成を相談したい": "subsidy",
+  "会社の売却を検討している": "ma_sell",
+  "後継者不在で悩んでいる": "ma_sell",
+  "第三者への承継を相談したい": "ma_sell",
+  "買収を考えている": "ma_buy",
+  "不動産の購入を検討している": "realestate_buy",
+  "収益物件や事業用物件の相談をしたい": "realestate_buy",
+  "不動産の売却を検討している": "realestate_sell",
+  "遊休資産の活用を相談したい": "realestate_sell",
+  "人材の採用で困っている": "hiring",
+  "定着率や離職率を改善したい": "hiring",
+  "組織体制を見直したい": "hiring",
+  "幹部候補や専門人材を探したい": "hiring"
 };
 
 const PRIORITY_THEME_LABELS = {
@@ -53,6 +126,9 @@ let selectedAssistant = null;
 let conversation = [];
 let intakePromptShown = false;
 let intakeFormShown = false;
+let choicePromptShown = false;
+let choiceStep = "";
+let choiceCategory = "";
 let latestSummary = "";
 let latestCategory = "経営相談";
 let latestSubcategory = "自由相談";
@@ -85,6 +161,9 @@ function resetToSelection() {
   conversation = [];
   intakePromptShown = false;
   intakeFormShown = false;
+  choicePromptShown = false;
+  choiceStep = "";
+  choiceCategory = "";
   latestSummary = "";
   latestCategory = "経営相談";
   latestSubcategory = "自由相談";
@@ -128,14 +207,11 @@ function createSecretaryCard(assistant) {
   button.innerHTML = `
     <div class="secretary-image-wrap">
       <img class="secretary-portrait-large" src="${assistant.image}" alt="${assistant.name}" />
-      <div class="secretary-image-glow ${assistant.key}"></div>
     </div>
-    <div class="secretary-card-body">
-      <div class="secretary-role-badge ${assistant.key}">${assistant.role}</div>
-      <div class="secretary-name">${assistant.name}</div>
-      <div class="secretary-copy">${assistant.selectionCopy}</div>
-      <div class="secretary-cta ${assistant.key}">${assistant.cta}</div>
-    </div>
+    <div class="secretary-role">${assistant.role}</div>
+    <div class="secretary-name">${assistant.name}</div>
+    <div class="secretary-copy">${assistant.selectionCopy}</div>
+    <div class="secretary-cta ${assistant.key}">${assistant.cta}</div>
   `;
   button.addEventListener("click", () => startConversation(assistant.key));
   return button;
@@ -146,19 +222,24 @@ async function startConversation(assistantKey) {
   conversation = [];
   intakePromptShown = false;
   intakeFormShown = false;
+  choicePromptShown = false;
+  choiceStep = "";
+  choiceCategory = "";
+  latestSummary = "";
+  latestCategory = "経営相談";
+  latestSubcategory = "自由相談";
+  latestPriorityTheme = "";
 
   headerAvatar.src = selectedAssistant.image;
   headerTitle.textContent = selectedAssistant.shortHeader;
   headerSubtitle.textContent = selectedAssistant.subtitle;
   chatBody.innerHTML = "";
   chatComposer.hidden = false;
-  chatInput.placeholder =
-    selectedAssistant.key === "ayumi"
-      ? "整理したいことを入力してください"
-      : "胸ん中にあることを入力してみん";
+  chatInput.value = "";
   autoResizeComposer();
 
   await typeBotMessage(selectedAssistant.intro);
+  chatInput.focus();
 }
 
 async function handleSend(event) {
@@ -180,7 +261,10 @@ async function handleSend(event) {
   try {
     const aiResult = await fetchAIReply();
     typingEl.remove();
-    await typeBotMessage(aiResult.reply, false);
+
+    if (aiResult.reply) {
+      await typeBotMessage(aiResult.reply, false);
+    }
 
     latestCategory = aiResult.category || latestCategory;
     latestSubcategory = aiResult.subcategory || latestSubcategory;
@@ -190,28 +274,45 @@ async function handleSend(event) {
       appendLinkNote(aiResult.articleHint);
     }
 
-    const shouldOffer = aiResult.shouldOfferIntake && !intakePromptShown && !intakeFormShown;
-    if (shouldOffer) {
-      intakePromptShown = true;
-      await typeBotMessage(selectedAssistant.intakeLine);
-      renderIntakeChoice();
-    }
+    await handlePostReplyFlow(aiResult);
   } catch (error) {
     typingEl.remove();
+
     const fallback = buildFallbackReply(text);
     await typeBotMessage(fallback.reply, false);
-    latestCategory = fallback.category;
-    latestSubcategory = fallback.subcategory;
-    latestPriorityTheme = fallback.priorityTheme;
 
-    if (fallback.shouldOfferIntake && !intakePromptShown && !intakeFormShown) {
-      intakePromptShown = true;
-      await typeBotMessage(selectedAssistant.intakeLine);
-      renderIntakeChoice();
-    }
+    latestCategory = fallback.category || latestCategory;
+    latestSubcategory = fallback.subcategory || latestSubcategory;
+    latestPriorityTheme = fallback.priorityTheme || latestPriorityTheme;
+
+    await handlePostReplyFlow(fallback);
   } finally {
     sendButton.disabled = false;
     chatInput.focus();
+  }
+}
+
+async function handlePostReplyFlow(result) {
+  const userTurns = getUserTurnCount();
+  const hasConcreteIssue = hasConcreteConsultation();
+
+  if (result.shouldOfferChoices && !choicePromptShown && !intakeFormShown) {
+    choicePromptShown = true;
+    await typeBotMessage(selectedAssistant.choiceLead);
+    renderPrimaryChoices();
+    return;
+  }
+
+  const shouldOffer = !intakePromptShown && !intakeFormShown && (
+    result.shouldOfferIntake ||
+    (hasConcreteIssue && userTurns >= 4) ||
+    (choicePromptShown && latestSubcategory !== "自由相談")
+  );
+
+  if (shouldOffer) {
+    intakePromptShown = true;
+    await typeBotMessage(selectedAssistant.intakeLine);
+    renderIntakeChoice();
   }
 }
 
@@ -240,20 +341,35 @@ async function fetchAIReply() {
     conversation.push({ role: "assistant", content: data.reply });
   }
 
-  return data;
+  const userTurns = getUserTurnCount();
+  const localPriorityTheme = detectPriorityTheme(conversation);
+  const localCategoryMap = inferCategoryFromTheme(localPriorityTheme);
+  const concrete = hasConcreteConsultation();
+
+  return {
+    ...data,
+    priorityTheme: data.priorityTheme || localPriorityTheme,
+    category: data.category || localCategoryMap.category,
+    subcategory: data.subcategory || localCategoryMap.subcategory,
+    shouldOfferChoices: Boolean(data.shouldOfferChoices) || (userTurns >= 7 && !concrete),
+    shouldOfferIntake: Boolean(data.shouldOfferIntake) || (userTurns >= 4 && concrete)
+  };
 }
 
 function buildFallbackReply(userText) {
   const lower = userText.toLowerCase();
-  const userTurns = conversation.filter((item) => item.role === "user").length;
+  const userTurns = getUserTurnCount();
   const priorityTheme = detectPriorityTheme(conversation);
   const categoryMap = inferCategoryFromTheme(priorityTheme);
+  const concrete = hasConcreteConsultation();
 
   let reply = "";
 
   if (selectedAssistant.key === "ayumi") {
     if (priorityTheme) {
       reply = `ありがとうございます。${PRIORITY_THEME_LABELS[priorityTheme]}に関わりそうなお話ですね。背景や、いま一番整理したい点をもう少しだけ教えていただけますか。`;
+    } else if (userTurns >= 7) {
+      reply = "ありがとうございます。ここまでのお話から、いくつか近い相談テーマを並べると整理しやすそうです。";
     } else if (lower.includes("人") || lower.includes("採用")) {
       reply = "ありがとうございます。人や体制に関わるお悩みとして整理できそうです。いまは採用そのものが難しいのか、定着や配置が難しいのか、どちらが近いでしょうか。";
     } else if (lower.includes("売上") || lower.includes("利益")) {
@@ -264,6 +380,8 @@ function buildFallbackReply(userText) {
   } else {
     if (priorityTheme) {
       reply = `${PRIORITY_THEME_LABELS[priorityTheme]}に近い話かもしれんな。まずは、なんでそれが気になっとるんか、いちばん引っかかるところから聞かせて。`;
+    } else if (userTurns >= 7) {
+      reply = "ここまで聞いたら、近いテーマを選びながら整理してもよさそうじゃな。";
     } else if (lower.includes("採用") || lower.includes("人材")) {
       reply = "人のことで、だいぶ気ぃ使うとるんじゃな。採れんのか、続かんのか、そこらへんで一番しんどいのはどこなん。";
     } else if (lower.includes("新規") || lower.includes("事業")) {
@@ -275,22 +393,98 @@ function buildFallbackReply(userText) {
 
   conversation.push({ role: "assistant", content: reply });
 
-  const shouldOfferIntake = userTurns >= 3;
   return {
     reply,
-    shouldOfferIntake,
+    shouldOfferIntake: userTurns >= 4 && concrete,
+    shouldOfferChoices: userTurns >= 7 && !concrete,
     priorityTheme,
     category: categoryMap.category,
     subcategory: categoryMap.subcategory
   };
 }
 
-function renderIntakeChoice() {
+function renderPrimaryChoices() {
+  clearChoiceRows();
+  choiceStep = "category";
+
+  const row = document.createElement("div");
+  row.className = "option-row choice-row";
+
+  Object.keys(CATEGORY_CHOICES).forEach((category) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "option-button choice-button";
+    button.textContent = category;
+    button.addEventListener("click", () => renderSecondaryChoices(category));
+    row.appendChild(button);
+  });
+
+  chatBody.appendChild(row);
+  scrollToBottom();
+}
+
+async function renderSecondaryChoices(category) {
+  clearChoiceRows();
+  choiceStep = "subcategory";
+  choiceCategory = category;
+  latestCategory = category;
+
+  await typeBotMessage(
+    selectedAssistant.key === "ayumi"
+      ? `「${category}」に近そうですね。差し支えなければ、さらに近い内容をお選びください。`
+      : `「${category}」が近そうじゃな。もうひとつ近いもんを選んでみん？`
+  );
+
+  const row = document.createElement("div");
+  row.className = "option-row choice-row";
+
+  (CATEGORY_CHOICES[category] || []).forEach((label) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "secondary-button choice-button";
+    button.textContent = label;
+    button.addEventListener("click", () => handleSubcategoryChoice(category, label));
+    row.appendChild(button);
+  });
+
+  chatBody.appendChild(row);
+  scrollToBottom();
+}
+
+async function handleSubcategoryChoice(category, subcategory) {
+  clearChoiceRows();
+  choicePromptShown = true;
+  latestCategory = category;
+  latestSubcategory = subcategory;
+  latestPriorityTheme = SUBCATEGORY_THEME_MAP[subcategory] || latestPriorityTheme;
+
+  const selectedText = `${category} / ${subcategory}`;
+  appendUserMessage(`近いテーマは「${selectedText}」です。`);
+  conversation.push({ role: "user", content: `近い相談テーマは「${selectedText}」です。` });
+
+  const reply = selectedAssistant.key === "ayumi"
+    ? `ありがとうございます。「${subcategory}」に近いご相談として整理して進められそうです。必要でしたら、この内容でAUUへの相談送信に進めますし、送る前にもう少しだけ補足していただいても大丈夫です。`
+    : `ありがとう。「${subcategory}」の線で整理したら進めやすそうじゃ。必要ならこの内容で相談を送れるし、送る前にもうちょい話してもええよ。`;
+
+  conversation.push({ role: "assistant", content: reply });
+  await typeBotMessage(reply, false);
+
+  if (!intakePromptShown && !intakeFormShown) {
+    intakePromptShown = true;
+    renderIntakeChoice("この整理内容で相談を送る", "このテーマで少し話す");
+  }
+}
+
+function clearChoiceRows() {
+  chatBody.querySelectorAll(".choice-row").forEach((row) => row.remove());
+}
+
+function renderIntakeChoice(primaryLabel = "相談内容を送る", secondaryLabel = "まだ少し話したい") {
   const row = document.createElement("div");
   row.className = "option-row";
   row.innerHTML = `
-    <button type="button" class="option-button">相談内容を送る</button>
-    <button type="button" class="secondary-button">まだ少し話したい</button>
+    <button type="button" class="option-button">${primaryLabel}</button>
+    <button type="button" class="secondary-button">${secondaryLabel}</button>
   `;
 
   const [primary, secondary] = row.querySelectorAll("button");
@@ -305,7 +499,7 @@ function renderIntakeChoice() {
     intakePromptShown = false;
     await typeBotMessage(
       selectedAssistant.key === "ayumi"
-        ? "承知しました。焦がずに大丈夫ですので、もう少し一緒に整理していきましょう。"
+        ? "承知しました。焦らずで大丈夫ですので、もう少し一緒に整理していきましょう。"
         : "ええよ。急がんでええけぇ、もう少し話してみん。"
     );
   });
@@ -380,7 +574,7 @@ async function submitConsultation() {
     typingEl.remove();
   }
 
-  latestSummary = summaryPayload.summaryText;
+  latestSummary = summaryPayload.summaryText || summaryPayload.summary || buildLocalSummary().summaryText;
   latestCategory = summaryPayload.category || latestCategory;
   latestSubcategory = summaryPayload.subcategory || latestSubcategory;
   latestPriorityTheme = summaryPayload.priorityTheme || latestPriorityTheme;
@@ -420,8 +614,10 @@ async function submitConsultation() {
 }
 
 function buildLocalSummary() {
-  const priorityTheme = detectPriorityTheme(conversation);
-  const categoryMap = inferCategoryFromTheme(priorityTheme);
+  const priorityTheme = latestPriorityTheme || detectPriorityTheme(conversation);
+  const categoryMap = latestCategory !== "経営相談" || latestSubcategory !== "自由相談"
+    ? { category: latestCategory, subcategory: latestSubcategory }
+    : inferCategoryFromTheme(priorityTheme);
 
   const userMessages = conversation
     .filter((item) => item.role === "user")
@@ -433,6 +629,7 @@ function buildLocalSummary() {
   const summaryLines = [
     `【担当秘書】${selectedAssistant.name}`,
     `【相談概要】${overview}`,
+    `【整理テーマ】${categoryMap.category} / ${categoryMap.subcategory}`,
     "【本質的な課題（推定）】会話内容をもとに、状況整理と優先順位づけが必要な課題があると考えられます。",
     latestThree ? `【会話メモ】${latestThree}` : "【会話メモ】会話履歴の整理中です。",
     priorityTheme ? `【重点ヒアリング】${PRIORITY_THEME_LABELS[priorityTheme]}` : ""
@@ -446,6 +643,38 @@ function buildLocalSummary() {
   };
 }
 
+function getUserTurnCount() {
+  return conversation.filter((item) => item.role === "user").length;
+}
+
+function hasConcreteConsultation() {
+  const userMessages = conversation
+    .filter((item) => item.role === "user")
+    .map((item) => item.content.trim())
+    .filter(Boolean);
+
+  if (!userMessages.length) return false;
+
+  if (latestSubcategory && latestSubcategory !== "自由相談") return true;
+  if (detectPriorityTheme(conversation)) return true;
+
+  const longMessages = userMessages.filter((text) => text.length >= 24).length;
+  const detailHits = countDetailSignals(userMessages.join("\n"));
+
+  return longMessages >= 2 || detailHits >= 3;
+}
+
+function countDetailSignals(text) {
+  const detailPatterns = [
+    "補助金", "助成金", "設備投資", "採用", "人材", "離職", "組織", "後継者", "事業承継",
+    "m&a", "売却", "買収", "譲渡", "不動産", "土地", "物件", "売上", "利益", "資金繰り",
+    "融資", "税務", "節税", "新規事業", "協業", "パートナー", "dx", "ai"
+  ];
+
+  const normalized = text.toLowerCase();
+  return detailPatterns.reduce((count, keyword) => count + (normalized.includes(keyword) ? 1 : 0), 0);
+}
+
 function detectPriorityTheme(items) {
   const combined = items.map((item) => item.content).join("\n").toLowerCase();
 
@@ -453,9 +682,9 @@ function detectPriorityTheme(items) {
     { key: "subsidy", list: ["補助金", "助成金", "給付金", "ものづくり補助金", "事業再構築", "設備投資"] },
     { key: "ma_buy", list: ["買収", "買いたい", "m&a", "ma", "譲り受け", "会社を買", "事業を買"] },
     { key: "ma_sell", list: ["売却", "譲渡", "事業承継", "後継者不在", "会社を売", "株式譲渡"] },
-    { key: "realestate_buy", list: ["不動産を買", "土地を買", "物件を買", "ビルを買", "購入したい不動産"] },
-    { key: "realestate_sell", list: ["不動産を売", "土地を売", "物件を売", "建物を売", "売却したい不動産"] },
-    { key: "hiring", list: ["採用", "人材", "募集", "求人", "雇用", "中途", "新卒"] },
+    { key: "realestate_buy", list: ["不動産を買", "土地を買", "物件を買", "ビルを買", "購入したい不動産", "収益物件"] },
+    { key: "realestate_sell", list: ["不動産を売", "土地を売", "物件を売", "建物を売", "売却したい不動産", "遊休資産"] },
+    { key: "hiring", list: ["採用", "人材", "募集", "求人", "雇用", "中途", "新卒", "離職", "定着"] },
     { key: "jobchange", list: ["転職", "就職", "次の会社", "キャリア", "転職したい", "就職したい"] }
   ];
 
@@ -477,13 +706,13 @@ function inferCategoryFromTheme(priorityTheme) {
     case "ma_sell":
       return { category: "M&A・事業承継", subcategory: "譲渡・売却ニーズ" };
     case "realestate_buy":
-      return { category: "不動産相談", subcategory: "不動産購入ニーズ" };
+      return { category: "不動産", subcategory: "不動産購入ニーズ" };
     case "realestate_sell":
-      return { category: "不動産相談", subcategory: "不動産売却ニーズ" };
+      return { category: "不動産", subcategory: "不動産売却ニーズ" };
     case "hiring":
-      return { category: "採用・組織・労務", subcategory: "採用ニーズ" };
+      return { category: "人材", subcategory: "採用ニーズ" };
     case "jobchange":
-      return { category: "人材相談", subcategory: "転職・就職ニーズ" };
+      return { category: "人材", subcategory: "転職・就職ニーズ" };
     default:
       return { category: "経営相談", subcategory: "自由相談" };
   }

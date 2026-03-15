@@ -659,3 +659,22 @@ body {
     box-sizing: border-box;
   }
 }
+
+
+.choice-row {
+  margin-top: -2px;
+}
+
+.choice-button {
+  border-radius: 16px;
+  padding: 11px 14px;
+  line-height: 1.5;
+  white-space: normal;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .choice-button {
+    width: 100%;
+  }
+}

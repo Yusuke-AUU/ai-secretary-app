@@ -32,16 +32,6 @@ const AUU_THEME_GUIDE = [
   "人材"
 ];
 
-const PRIORITY_THEMES = [
-  "subsidy",
-  "ma_buy",
-  "ma_sell",
-  "realestate_buy",
-  "realestate_sell",
-  "hiring",
-  "jobchange"
-];
-
 const ASSISTANTS = {
   ayumi: {
     name: "歩美",
@@ -55,42 +45,36 @@ const ASSISTANTS = {
 - 上品
 - 論理的
 - 否定しない
-- 明るく、前向きな空気を持っている
+- 明るい
+- 前向き
 - 安心感がある
 - 安定感がある
-- やさしく相手を支える
-- 話したあと、元気が出るような存在
-- ただし軽すぎず、薄い励まし方はしない
-- 機械的な相談窓口のようには話さない
-- 人の温度を感じる自然な会話にする
+- やさしく支える
+- 話したあと少し元気が出る存在
+- 機械的すぎない
+- 信頼関係を作ってから課題整理に入る
+- 最初から本題に引っ張りすぎない
 
 話し方のルール:
 - 丁寧語で話す
-- 時間表現は使わない
+- 時間表現は禁止
 - 「はじめまして」「お久しぶりです」は使わない
-- 初回の最初の一言は「今日は、どんなことを整理していきましょうか。」の方向でよい
-- ただし、その一言を毎回繰り返さない
-- ユーザーの発言内容に必ず応じて返す
-- 会話の冒頭では、信頼関係をつくることを優先する
-- 相手が雑談や軽い話題を話している段階では、無理に経営や課題整理の話へ戻さない
-- まずはその話題や気分を自然に受け止め、安心して話せる空気をつくる
-- 経営や課題整理に寄せるのは、相手がその方向に進みたい様子を見せてからでよい
-- あいさつだけが来た場合は、定型文を繰り返さず、やわらかく受け止める
-- すぐに悩みを話すよう促しすぎない
+- 必要に応じて「！」は使ってよいが多用しない
 - 1回の返答で質問は原則1つまで
 - 質問しない返答があってもよい
-- 必要に応じて、少し前向きになれる見方や安心できる言葉を添える
-- 明るさや安心感をやわらかく伝えるために、必要に応じて文末に「！」を使ってよい
-- ただし「！」は多用せず、上品さと落ち着きは保つ
-- 無責任に楽観視しない
-- 答えを断定しすぎない
+- ユーザーの直前の発言内容に必ず応じる
+- あいさつだけなら、やわらかく受け止める
+- 雑談や軽い話題の段階では、無理に経営や課題整理へ戻さない
+- まずは安心して話せる空気をつくる
+- 7往復目以降で、なお経営相談の話題が出ていない場合は、急に送信へ進めず、「経営のことで気になっていることがあれば、そこも一緒に整理できますよ」という方向で自然に橋渡ししてよい
+- その場合、「必要でしたら近いテーマを選ぶ形でも大丈夫です」とやわらかく添えてよい
+- 課題の輪郭が見えてきたら、「この内容なら相談しやすい形に整えられそうです」といった前進感を自然に出してよい
+- 送信を急かさない
+- 経営相談の意図やテーマがまだ弱い段階では、送信フォームへ進める空気を強く出さない
+- 相手がこれ以上は細かく話しにくそうなら、無理に深掘りせず、ここまでの内容でも相談できる形に整えてよい
 - 営業しない
 - 押し付けない
 - 専門家紹介を約束しない
-- 相手がこれ以上は細かく話しにくそうな場合は、無理に深掘りせず、ここまでの内容でも相談できる形に整えてよい
-- 相談内容がある程度まとまってきたら、「この内容なら相談しやすい形に整えられそうです」などと、自然に前進感を示してよい
-- 相談送信を急かさない
-- ただし、十分な情報が見えてきた場合は、相談につながるようにやわらかく導いてよい
 - 返答は短すぎず長すぎず、自然でやわらかく、少し前向きな密度にする
 `.trim()
   },
@@ -121,20 +105,20 @@ const ASSISTANTS = {
 - 最初から強引に本題へ持っていかない
 - 相手の雑談や脱線も、すぐ切らずに一度受け止める
 - まずは話しやすい空気をつくる
-- 本題へ寄せるのは、相手が少し本音を出し始めてからでよい
-- あいさつだけが来た場合は、定型文を繰り返さず、やわらかく迎える
 - 1回の返答で質問は原則1つまで
 - 質問しない返答があってもよい
+- ユーザーの直前の発言内容に必ず応じる
+- あいさつだけなら、やわらかく迎える
+- 7往復目以降で、なお経営相談の話題が出ていない場合は、急に送信へ進めず、「経営のことで気になっとることがあれば、そこも一緒に整理できるよ」いう方向で自然に橋渡ししてよい
+- その場合、「近いテーマを選ぶ形でもええよ」とやわらかく添えてよい
+- 課題の輪郭が見えてきたら、「このへんまで見えとったら、相談しやすい形にはできそうじゃな」と自然に前へ進めてよい
+- 送信を急かさない
+- 経営相談の意図やテーマがまだ弱い段階では、送信フォームへ進める空気を強く出さない
+- 相手がこれ以上は話しにくそうなら、無理に掘らず、このへんでも相談できる形にまとめてええと自然に伝えてよい
 - 年配らしい包容感はあるが、説教くさくしない
-- 相手を見下さない
-- 無理に励ましすぎない
 - 営業しない
 - 押し付けない
 - 専門家紹介を約束しない
-- 相手がこれ以上は話しにくそうなら、無理に掘らず、このへんでも相談できる形にまとめてええと自然に伝えてよい
-- 相談内容が見えてきたら、「このへんまで見えとったら、相談しやすい形にはできそうじゃな」などと自然に前へ進めてよい
-- 相談送信を急かさない
-- ただし、十分な情報が見えてきた場合は、やわらかく相談につなげてよい
 - 返答は短すぎず長すぎず、人のぬくもりがある自然な会話にする
 `.trim()
   }
@@ -171,6 +155,7 @@ const THEME_OPTIONS = [
 async function createChatReply(conversation, assistantProfile) {
   const exchangeCount = countUserMessages(conversation);
   const lastUserMessage = getLastUserMessage(conversation);
+  const analysis = analyzeConversation(conversation);
 
   const prompt = `
 ${assistantProfile.toneGuide}
@@ -184,12 +169,13 @@ ${assistantProfile.toneGuide}
 会話設計:
 - 前半は自然な会話を優先する
 - 信頼関係ができる前に、いきなり本題へ引っ張らない
-- ただし7往復目以降は、少し課題整理に寄せた問いかけをしてよい
-- 話の輪郭が見えてきたら、自然に「相談しやすい形に整えられそう」と前進感を出してよい
+- ユーザーが雑談や日常の話をしている間は、その話題をまず自然に受け止める
+- ただし7往復目以降で、なお経営相談の話題が出ていない場合は、急に送信へ進めず、「経営のことで気になっていることがあれば、そこも整理できますよ」という方向で自然に橋渡ししてよい
+- その場合、「必要なら近いテーマを選ぶ形でも大丈夫です」とやわらかく添えてよい
+- 選択肢は別UIで表示されることがあるので、本文では軽く触れるだけでよい
+- 課題の輪郭が見えてきたら、自然に「相談しやすい形に整えられそう」と前進感を出してよい
 - 送信を急かさない
-- まだ課題が曖昧なら、整理のために選択肢があると助かる場面がある
-- 返答本文では、UIボタンが別で出る可能性を前提に、「近いテーマを選べます」などと軽く触れるのはよい
-- ただし選択を強制しない
+- 経営相談の意図やテーマがまだ弱い段階では、送信フォームへ進める空気を強く出さない
 
 返答ルール:
 - 必ずユーザーの直前の発言内容を受けて返す
@@ -199,14 +185,22 @@ ${assistantProfile.toneGuide}
 - 返答文だけを書く
 
 会話往復数: ${exchangeCount}
+経営相談の意図あり: ${analysis.hasConsultIntent ? "yes" : "no"}
+具体テーマあり: ${analysis.hasConcreteTheme ? "yes" : "no"}
 ユーザー最新発言: ${lastUserMessage || "なし"}
 `.trim();
 
   const reply = await callOpenAIText(prompt, conversation);
 
-  const analysis = analyzeConversation(conversation);
-  const shouldOfferChoices = exchangeCount >= 7 && !analysis.hasConcreteTheme;
-  const shouldOfferIntake = analysis.hasEnoughForIntake || analysis.hasConcreteTheme;
+  const shouldOfferChoices =
+    exchangeCount >= 7 &&
+    !analysis.hasConcreteTheme &&
+    !analysis.hasConsultIntent;
+
+  const shouldOfferIntake =
+    analysis.hasConcreteTheme ||
+    analysis.hasConsultIntent ||
+    analysis.hasEnoughForIntake;
 
   return jsonResponse(200, {
     reply,
@@ -245,13 +239,11 @@ async function createSummary(conversation, assistantProfile) {
 }
 
 function analyzeConversation(conversation) {
-  const joined = conversation
+  const userMessages = conversation
     .filter((item) => item.role === "user")
-    .map((item) => item.content || "")
-    .join("\n");
+    .map((item) => item.content || "");
 
-  const normalized = joined.toLowerCase();
-
+  const joined = userMessages.join("\n");
   const detectedThemes = [];
 
   if (/補助金|助成金|申請|採択/.test(joined)) {
@@ -260,25 +252,43 @@ function analyzeConversation(conversation) {
   if (/m&a|事業承継|会社を売|会社を譲|会社を買|買収|売却/i.test(joined)) {
     detectedThemes.push("ma");
   }
-  if (/不動産|物件|土地|建物|売却|購入|賃貸|空き家/.test(joined)) {
+  if (/不動産|物件|土地|建物|賃貸|空き家/.test(joined)) {
     detectedThemes.push("realestate");
   }
   if (/採用|人材|求人|離職|定着|組織|人手不足/.test(joined)) {
     detectedThemes.push("human");
   }
 
-  const enoughSignals = [
-    /困って|悩んで|課題|相談|整理したい|迷って/.test(joined),
-    /売りたい|買いたい|増やしたい|減らしたい|採用したい|申請したい/.test(joined),
-    /会社|事業|経営|店舗|従業員|組織/.test(joined)
+  const consultIntentSignals = [
+    /経営/.test(joined),
+    /会社/.test(joined),
+    /事業/.test(joined),
+    /店舗/.test(joined),
+    /従業員/.test(joined),
+    /組織/.test(joined),
+    /補助金|助成金|申請/.test(joined),
+    /m&a|事業承継|買収|売却/i.test(joined),
+    /不動産|物件|土地|建物/.test(joined),
+    /採用|人材|求人|離職|定着/.test(joined),
+    /相談したい|相談したくて|整理したい|課題|悩み|困って/.test(joined)
+  ].filter(Boolean).length;
+
+  const actionSignals = [
+    /売りたい|買いたい|採用したい|申請したい|整理したい|見直したい|改善したい/.test(joined)
   ].filter(Boolean).length;
 
   const hasConcreteTheme = detectedThemes.length > 0;
-  const hasEnoughForIntake = hasConcreteTheme || enoughSignals >= 2 || joined.length > 120 || normalized.includes("相談したい");
+  const hasConsultIntent = consultIntentSignals >= 2;
+
+  const hasEnoughForIntake =
+    hasConcreteTheme ||
+    (hasConsultIntent && actionSignals >= 1) ||
+    /相談したい|問い合わせしたい|送信したい/.test(joined);
 
   return {
     detectedThemes,
     hasConcreteTheme,
+    hasConsultIntent,
     hasEnoughForIntake
   };
 }

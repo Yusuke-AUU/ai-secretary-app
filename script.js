@@ -188,7 +188,7 @@ function resetToSelection() {
   intro.innerHTML = `
     <div class="intro-title">相談相手を選んでください</div>
     <div class="intro-text">
-      経営の悩みが整理できていなくても大丈夫です。<br>
+      経営の悩みが整っていなくても大丈夫です。<br>
       歩美とのり子が、悩みや本音を整理します。
     </div>
   `;

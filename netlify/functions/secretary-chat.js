@@ -16,7 +16,7 @@ exports.handler = async (event) => {
       return await createSummary(conversation, assistantProfile);
     }
 
-    return await createChatReply(conversation, assistantProfile);
+    return await createChatReply(conversation, assistant, assistantProfile);
   } catch (error) {
     return jsonResponse(500, {
       error: "Function Error",
@@ -66,8 +66,7 @@ const ASSISTANTS = {
 - あいさつだけなら、やわらかく受け止める
 - 雑談や軽い話題の段階では、無理に経営や課題整理へ戻さない
 - まずは安心して話せる空気をつくる
-- 5往復目以降で、なお経営相談の話題が出ていない場合は、仕事や経営で気になっていることがあればそこも整理できる、という方向で自然に橋渡ししてよい
-- 7往復目以降でも課題がまだ明確でない場合は、近いテーマを選ぶ形でも整理できるとやわらかく添えてよい
+- 経営相談の話題へ橋渡しするときは、急に切り替えず、直前の話題への感想を自然に一度述べてからつなぐ
 - 課題の輪郭が見えてきたら、「この内容なら相談しやすい形に整えられそうです」といった前進感を自然に出してよい
 - 送信を急かさない
 - 経営相談の意図やテーマがまだ弱い段階では、送信フォームへ進める空気を強く出さない
@@ -109,8 +108,7 @@ const ASSISTANTS = {
 - 質問しない返答があってもよい
 - ユーザーの直前の発言内容に必ず応じる
 - あいさつだけなら、やわらかく迎える
-- 5往復目以降で、なお経営相談の話題が出ていない場合は、仕事や経営で気になっとることがあればそこも整理できるよ、いう方向で自然に橋渡ししてよい
-- 7往復目以降でも課題がまだ明確でない場合は、近いテーマを選ぶ形でもええよとやわらかく添えてよい
+- 経営相談の話題へ橋渡しするときは、急に切り替えず、直前の話題への感想を自然に一度述べてからつなぐ
 - 課題の輪郭が見えてきたら、「このへんまで見えとったら、相談しやすい形にはできそうじゃな」と自然に前へ進めてよい
 - 送信を急かさない
 - 経営相談の意図やテーマがまだ弱い段階では、送信フォームへ進める空気を強く出さない
@@ -162,11 +160,52 @@ const THEME_OPTIONS = [
   }
 ];
 
-async function createChatReply(conversation, assistantProfile) {
+async function createChatReply(conversation, assistantId, assistantProfile) {
   const exchangeCount = countUserMessages(conversation);
   const lastUserMessage = getLastUserMessage(conversation);
   const analysis = analyzeConversation(conversation);
   const lastAssistantAskedQuestion = didLastAssistantAskQuestion(conversation);
+
+  const shouldBridgeToBusiness =
+    exchangeCount >= 5 &&
+    exchangeCount < 7 &&
+    !analysis.hasConsultIntent &&
+    !analysis.hasConcreteTheme &&
+    !lastAssistantAskedQuestion;
+
+  const shouldOfferChoices =
+    exchangeCount >= 7 &&
+    !analysis.hasConsultIntent &&
+    !analysis.hasConcreteTheme &&
+    !lastAssistantAskedQuestion;
+
+  const shouldOfferIntake =
+    analysis.hasConcreteTheme ||
+    analysis.hasEnoughForIntake;
+
+  const bridgeInstruction = shouldBridgeToBusiness
+    ? `
+このターンでは、次の形を必ず守ってください:
+- まず直前の話題に対して自然な感想や受け止めを1〜2文で返す
+- その段落は質問で終えず、「。」で終える
+- そのあと必ず空行を入れる
+- 次の一文で、経営相談への橋渡しをする
+- 歩美なら「ところで、経営に関するお悩みはありませんか？」に近い丁寧な表現にする
+- のり子なら「ところで、仕事や経営で気になっとることはない？」に近い自然な表現にする
+- 橋渡しの質問は1つだけにする
+- このターンでは選択肢の話は出さない
+`.trim()
+    : shouldOfferChoices
+      ? `
+このターンでは、次の形を必ず守ってください:
+- まず直前の話題への自然な受け止めを1〜2文で返す
+- そのあと空気を切らずに、「近いテーマを選ぶ形でも整理できます」程度のやわらかい案内を1文だけ添える
+- 選択肢ボタンは別UIで表示されるので、本文では列挙しない
+- 送信フォームへ急に進めない
+`.trim()
+      : `
+通常どおり、自然な会話を続けてください。
+`.trim();
 
   const prompt = `
 ${assistantProfile.toneGuide}
@@ -179,19 +218,22 @@ ${assistantProfile.toneGuide}
 
 会話設計:
 - 1〜4往復は自然な会話を優先する
-- 5往復目以降で、なお経営や仕事の課題が見えていない場合は、仕事や経営で気になっていることがあればそこも整理できる、という方向で自然に橋渡ししてよい
-- ただし急に切り替えず、直前の話題を一度ちゃんと受けてからつなぐ
-- 7往復目以降で、なお課題が明確でない場合は、近いテーマを選ぶ形でも整理できるとやわらかく伝えてよい
-- ただし、直前のあなたの返答が質問で終わっている場合は、その回答を待つことを優先し、選択肢へ急がない
+- 5往復目で、まだ経営相談の話題が出ていなければ、直前の話題を一度受けたうえで、経営に関する悩みがあるかを自然に聞いてよい
+- その質問に対する返答の中で経営課題が見えてきたら、そのまま会話を進める
+- 7往復目になってもなお経営相談の話題が見えていなければ、近いテーマを選ぶ形でも整理できるとやわらかく案内してよい
+- ただし、直前のあなたの返答が質問で終わっている場合は、その回答を待つことを優先する
 - ユーザーが雑談や日常の話をしている間は、その話題をまず自然に受け止める
 - 課題の輪郭が見えてきたら、自然に「相談しやすい形に整えられそう」と前進感を出してよい
 - 送信を急かさない
 - 経営相談の意図やテーマがまだ弱い段階では、送信フォームへ進める空気を強く出さない
 
+このターン専用の追加指示:
+${bridgeInstruction}
+
 返答ルール:
 - 必ずユーザーの直前の発言内容を受けて返す
 - 説明調になりすぎない
-- 返答は120〜220文字程度を目安に、自然な会話として返す
+- 返答は自然な会話として返す
 - JSONは出さない
 - 返答文だけを書く
 
@@ -202,17 +244,11 @@ ${assistantProfile.toneGuide}
 ユーザー最新発言: ${lastUserMessage || "なし"}
 `.trim();
 
-  const reply = await callOpenAIText(prompt, conversation);
+  let reply = await callOpenAIText(prompt, conversation);
 
-  const shouldOfferChoices =
-    exchangeCount >= 7 &&
-    !analysis.hasConcreteTheme &&
-    !analysis.hasConsultIntent &&
-    !lastAssistantAskedQuestion;
-
-  const shouldOfferIntake =
-    analysis.hasConcreteTheme ||
-    analysis.hasEnoughForIntake;
+  if (shouldBridgeToBusiness) {
+    reply = enforceBusinessBridge(reply, assistantId);
+  }
 
   return jsonResponse(200, {
     reply,
@@ -221,7 +257,7 @@ ${assistantProfile.toneGuide}
     exchangeCount,
     detectedThemes: analysis.detectedThemes,
     suggestedChoices: shouldOfferChoices ? THEME_OPTIONS : [],
-    shouldBridgeToBusiness: exchangeCount >= 5 && !analysis.hasConsultIntent && !analysis.hasConcreteTheme
+    shouldBridgeToBusiness
   });
 }
 
@@ -322,6 +358,33 @@ function didLastAssistantAskQuestion(conversation) {
 
   const lastAssistantMessage = assistantMessages[assistantMessages.length - 1].content || "";
   return /[？?]\s*$/.test(lastAssistantMessage.trim());
+}
+
+function enforceBusinessBridge(reply, assistantId) {
+  const bridgeLine =
+    assistantId === "noriko"
+      ? "ところで、仕事や経営で気になっとることはない？"
+      : "ところで、経営に関するお悩みはありませんか？";
+
+  const trimmed = (reply || "").trim();
+
+  if (!trimmed) {
+    return bridgeLine;
+  }
+
+  if (/経営に関するお悩みはありませんか|仕事や経営で気になっとることはない/.test(trimmed)) {
+    return trimmed;
+  }
+
+  const lines = trimmed.split("\n").map((line) => line.trim()).filter(Boolean);
+  let firstBlock = lines[0] || trimmed;
+
+  firstBlock = firstBlock.replace(/[？?]\s*$/, "。");
+  if (!/[。！!]$/.test(firstBlock)) {
+    firstBlock += "。";
+  }
+
+  return `${firstBlock}\n\n${bridgeLine}`;
 }
 
 async function callOpenAIText(prompt, conversation) {

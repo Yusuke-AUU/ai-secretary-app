@@ -188,8 +188,8 @@ function resetToSelection() {
   intro.innerHTML = `
     <div class="intro-title">相談相手を選んでください</div>
     <div class="intro-text">
-      経営の悩みが、まだうまく整理できていなくても大丈夫です。<br>
-      歩美とのり子が、それぞれのやり方で課題や本音を整理します。
+      経営の悩みが、うまく整理できていなくても大丈夫です。<br>
+      歩美とのり子が、それぞれ悩みや本音を整理します。
     </div>
   `;
   chatBody.appendChild(intro);
